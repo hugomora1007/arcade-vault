@@ -21,6 +21,28 @@
   --mono: var(--font-jetbrains-mono), var(--font-courier-prime), "Courier New", monospace;
 }
 
+/* Tokens expuestos a Tailwind v4 (bg-bg, text-cyan, font-display, ...).
+   Los nombres de fuente evitan chocar con --font-pixel de next/font. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-bg-3: var(--bg-3);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-ink-faint: var(--ink-faint);
+  --color-cyan: var(--cyan);
+  --color-magenta: var(--magenta);
+  --color-yellow: var(--yellow);
+  --color-green: var(--green);
+  --color-gold: var(--gold);
+  --color-silver: var(--silver);
+  --color-bronze: var(--bronze);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --font-display: var(--pixel);
+  --font-body: var(--mono);
+}
+
 * { box-sizing: border-box; }
 
 html, body, #root {
