@@ -199,6 +199,13 @@ a { color: inherit; text-decoration: none; }
   .av-nav .links { display: none; }
   .av-nav .coin-counter { display: none; }
   .av-nav .hamburger { display: inline-flex; }
+  /* el prototipo desbordaba a 375px: compactar gaps y botón de sesión */
+  .av-nav { gap: 10px; }
+  .av-nav .auth-btn { margin-left: 0; padding: 10px 12px; }
+}
+@media (max-width: 420px) {
+  /* «Iniciar Sesión» sigue disponible en el panel lateral */
+  .av-nav .auth-btn { display: none; }
 }
 
 .av-mobile-panel {
@@ -942,7 +949,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 720px) {
-  .hall-table .th, .hall-table .tr { grid-template-columns: 50px 1fr 90px 90px; font-size: 12px; padding: 10px 12px; }
+  .hall-table .th, .hall-table .tr { grid-template-columns: 40px minmax(0, 1fr) 78px 78px; font-size: 12px; padding: 10px 12px; gap: 6px; }
+  .hall-table .th { font-size: 8px; letter-spacing: 0.08em; }
+  .hall-table .tr .sc { font-size: 10px; }
   .av-grid { padding: 0 16px; }
   .av-hero { padding: 36px 16px 16px; }
   .av-filters { padding: 0 16px; }
