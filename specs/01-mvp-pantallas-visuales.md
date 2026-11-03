@@ -1,6 +1,6 @@
 # SPEC 01 — MVP visual de Arcade Vault (todas las pantallas)
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** Ninguna (primer spec; parte del scaffold de `create-next-app`)
 > **Date:** 2026-11-03
 > **Objective:** Portar a Next.js (App Router) las cinco pantallas del prototipo `references/templates/` (Biblioteca, Detalle, Reproductor, Auth y Salón de la Fama) como maqueta visual con datos mock, sin implementar ningún juego.
@@ -104,25 +104,25 @@ Antes del paso 3 se debe leer la guía correspondiente en `node_modules/next/dis
 
 ## Acceptance criteria
 
-- [ ] `npm run build` termina sin errores de TypeScript ni de compilación.
-- [ ] `npm run lint` termina sin errores.
-- [ ] `/` muestra el hero «ARCADE VAULT» y 8 tarjetas de juego.
-- [ ] Escribir «caí» en el buscador deja solo la tarjeta CAÍDA.
-- [ ] Pulsar el chip «SHOOTER» muestra exactamente INVASORES y ROCAS.
-- [ ] Una búsqueda sin coincidencias muestra «NO HAY RESULTADOS».
-- [ ] Pulsar una tarjeta o su botón JUGAR navega a `/juegos/<id>`.
-- [ ] `/juegos/caida` muestra el título, la descripción larga, 3 estadísticas y un ranking de 10 filas.
-- [ ] `/juegos/no-existe` devuelve la página 404.
-- [ ] JUGAR AHORA en el detalle navega a `/juegos/<id>/jugar`; VOLVER AL VAULT navega a `/`.
-- [ ] En el reproductor la puntuación aumenta con el tiempo; PAUSA la detiene y muestra «EN PAUSA»; REANUDAR la continúa.
-- [ ] FIN abre el modal «FIN DEL JUEGO» con la puntuación final; GUARDAR PUNTUACIÓN muestra «PUNTUACIÓN GUARDADA_» y no escribe en `localStorage`.
-- [ ] JUGAR DE NUEVO reinicia puntuación, vidas y nivel; SALIR vuelve a `/juegos/<id>`.
-- [ ] `/salon` muestra podio top 3 y 12 filas; cambiar de tab cambia los datos; no existe la fila «tu mejor marca».
-- [ ] `/auth` alterna entre «INICIAR SESIÓN» y «CREAR CUENTA» (el campo de correo solo aparece en la segunda).
-- [ ] Enviar el formulario de `/auth` o pulsar «JUGAR COMO INVITADO» navega a `/`.
-- [ ] La nav aparece en las 5 rutas, resalta «Biblioteca» en `/`, `/juegos/*` y «Salón de la Fama» en `/salon`.
-- [ ] A 375 px de ancho la nav muestra el botón hamburguesa y el panel lateral abre y cierra.
-- [ ] La consola del navegador no muestra errores de hidratación en ninguna de las 5 rutas.
+- [X] `npm run build` termina sin errores de TypeScript ni de compilación.
+- [X] `npm run lint` termina sin errores.
+- [X] `/` muestra el hero «ARCADE VAULT» y 8 tarjetas de juego.
+- [X] Escribir «caí» en el buscador deja solo la tarjeta CAÍDA.
+- [X] Pulsar el chip «SHOOTER» muestra exactamente INVASORES y ROCAS.
+- [X] Una búsqueda sin coincidencias muestra «NO HAY RESULTADOS».
+- [X] Pulsar una tarjeta o su botón JUGAR navega a `/juegos/<id>`.
+- [X] `/juegos/caida` muestra el título, la descripción larga, 3 estadísticas y un ranking de 10 filas.
+- [X] `/juegos/no-existe` devuelve la página 404.
+- [X] JUGAR AHORA en el detalle navega a `/juegos/<id>/jugar`; VOLVER AL VAULT navega a `/`.
+- [X] En el reproductor la puntuación aumenta con el tiempo; PAUSA la detiene y muestra «EN PAUSA»; REANUDAR la continúa.
+- [X] FIN abre el modal «FIN DEL JUEGO» con la puntuación final; GUARDAR PUNTUACIÓN muestra «PUNTUACIÓN GUARDADA_» y no escribe en `localStorage`.
+- [X] JUGAR DE NUEVO reinicia puntuación, vidas y nivel; SALIR vuelve a `/juegos/<id>`.
+- [X] `/salon` muestra podio top 3 y 12 filas; cambiar de tab cambia los datos; no existe la fila «tu mejor marca».
+- [X] `/auth` alterna entre «INICIAR SESIÓN» y «CREAR CUENTA» (el campo de correo solo aparece en la segunda).
+- [X] Enviar el formulario de `/auth` o pulsar «JUGAR COMO INVITADO» navega a `/`.
+- [X] La nav aparece en las 5 rutas, resalta «Biblioteca» en `/`, `/juegos/*` y «Salón de la Fama» en `/salon`.
+- [X] A 375 px de ancho la nav muestra el botón hamburguesa y el panel lateral abre y cierra.
+- [X] La consola del navegador no muestra errores de hidratación en ninguna de las 5 rutas.
 
 ---
 
