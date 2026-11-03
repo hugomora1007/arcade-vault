@@ -17,8 +17,33 @@
   --bronze: #d97a3a;
   --line: rgba(0, 245, 255, 0.18);
   --line-2: rgba(255, 255, 255, 0.06);
-  --pixel: var(--font-pixel), "Press Start 2P", system-ui, monospace;
-  --mono: var(--font-jetbrains-mono), var(--font-courier-prime), "Courier New", monospace;
+  /* Mismas pilas que el prototipo. next/font ya declara estas familias; se
+     evita su fuente de fallback (Arial ajustada) que cambia el render de
+     glifos que no están en la fuente, como ▲ y ⌕. */
+  --pixel: "Press Start 2P", system-ui, monospace;
+  --mono: "JetBrains Mono", "Courier Prime", "Courier New", monospace;
+}
+
+/* Tokens expuestos a Tailwind v4 (bg-bg, text-cyan, font-display, ...).
+   Los nombres de fuente evitan chocar con --font-pixel de next/font. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-bg-3: var(--bg-3);
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-ink-faint: var(--ink-faint);
+  --color-cyan: var(--cyan);
+  --color-magenta: var(--magenta);
+  --color-yellow: var(--yellow);
+  --color-green: var(--green);
+  --color-gold: var(--gold);
+  --color-silver: var(--silver);
+  --color-bronze: var(--bronze);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --font-display: var(--pixel);
+  --font-body: var(--mono);
 }
 
 * { box-sizing: border-box; }
@@ -38,6 +63,10 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
+
+/* El prototipo usa el peso por defecto del navegador en los títulos (negrita
+   sintetizada sobre Press Start 2P); el preflight de Tailwind lo resetea. */
+h1, h2, h3, h4, h5, h6 { font-weight: bold; }
 
 button, input, select { font: inherit; color: inherit; }
 
@@ -177,6 +206,13 @@ a { color: inherit; text-decoration: none; }
   .av-nav .links { display: none; }
   .av-nav .coin-counter { display: none; }
   .av-nav .hamburger { display: inline-flex; }
+  /* el prototipo desbordaba a 375px: compactar gaps y botón de sesión */
+  .av-nav { gap: 10px; }
+  .av-nav .auth-btn { margin-left: 0; padding: 10px 12px; }
+}
+@media (max-width: 420px) {
+  /* «Iniciar Sesión» sigue disponible en el panel lateral */
+  .av-nav .auth-btn { display: none; }
 }
 
 .av-mobile-panel {
@@ -920,7 +956,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 720px) {
-  .hall-table .th, .hall-table .tr { grid-template-columns: 50px 1fr 90px 90px; font-size: 12px; padding: 10px 12px; }
+  .hall-table .th, .hall-table .tr { grid-template-columns: 40px minmax(0, 1fr) 78px 78px; font-size: 12px; padding: 10px 12px; gap: 6px; }
+  .hall-table .th { font-size: 8px; letter-spacing: 0.08em; }
+  .hall-table .tr .sc { font-size: 10px; }
   .av-grid { padding: 0 16px; }
   .av-hero { padding: 36px 16px 16px; }
   .av-filters { padding: 0 16px; }
