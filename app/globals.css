@@ -17,8 +17,11 @@
   --bronze: #d97a3a;
   --line: rgba(0, 245, 255, 0.18);
   --line-2: rgba(255, 255, 255, 0.06);
-  --pixel: var(--font-pixel), "Press Start 2P", system-ui, monospace;
-  --mono: var(--font-jetbrains-mono), var(--font-courier-prime), "Courier New", monospace;
+  /* Mismas pilas que el prototipo. next/font ya declara estas familias; se
+     evita su fuente de fallback (Arial ajustada) que cambia el render de
+     glifos que no están en la fuente, como ▲ y ⌕. */
+  --pixel: "Press Start 2P", system-ui, monospace;
+  --mono: "JetBrains Mono", "Courier Prime", "Courier New", monospace;
 }
 
 /* Tokens expuestos a Tailwind v4 (bg-bg, text-cyan, font-display, ...).
@@ -60,6 +63,10 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
+
+/* El prototipo usa el peso por defecto del navegador en los títulos (negrita
+   sintetizada sobre Press Start 2P); el preflight de Tailwind lo resetea. */
+h1, h2, h3, h4, h5, h6 { font-weight: bold; }
 
 button, input, select { font: inherit; color: inherit; }
 
