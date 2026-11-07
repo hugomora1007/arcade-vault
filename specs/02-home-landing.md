@@ -1,6 +1,6 @@
 # SPEC 02 — Home (landing page) y mudanza de la Biblioteca a `/games`
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 01
 > **Date:** 2026-11-06
 > **Objective:** Convertir `/` en la landing page del prototipo `references/templates/home-about/home.jsx` y mover la Biblioteca actual a `/games`.
@@ -119,22 +119,22 @@ Antes del paso 1 se debe leer en `node_modules/next/dist/docs/` la guía de App 
 
 ## Acceptance criteria
 
-- [ ] `npm run build` termina sin errores de TypeScript ni de compilación.
-- [ ] `npm run lint` termina sin errores.
-- [ ] `/` muestra el título «EL ARCADE / CLÁSICO ESTÁ / DE VUELTA» y las 7 secciones en el orden del Alcance.
-- [ ] La sección «¿POR QUÉ ARCADE VAULT?» muestra 4 tarjetas y «JUEGOS DISPONIBLES AHORA» muestra exactamente 6 mini-tarjetas.
-- [ ] Pulsar una mini-tarjeta navega a `/juegos/<id>` del juego correspondiente.
-- [ ] «EXPLORAR JUEGOS», «VER TODOS LOS JUEGOS →» e «INSERTAR MONEDA →» navegan a `/games`.
-- [ ] «CREAR CUENTA» y «EMPEZAR GRATIS →» navegan a `/auth`; «VER SALÓN →» navega a `/salon`.
-- [ ] «ÚLTIMAS PUNTUACIONES» muestra 7 filas y «TOP JUGADORES · HOY» muestra 5 filas, con la primera marcada como `top1`.
-- [ ] Las secciones con clase `.reveal` empiezan ocultas y se muestran al entrar en el viewport al hacer scroll.
-- [ ] `/games` muestra la Biblioteca con 8 tarjetas, el buscador y los chips funcionando igual que en el SPEC 01.
-- [ ] La nav muestra «Inicio», «Biblioteca» y «Salón de la Fama»; resalta «Inicio» solo en `/`, «Biblioteca» en `/games` y `/juegos/*`, y «Salón de la Fama» en `/salon`.
-- [ ] La nav no contiene el enlace «Acerca de».
-- [ ] VOLVER AL VAULT (detalle), SALIR (reproductor tras fin de juego) y el botón de vuelta del Salón navegan a `/games`.
-- [ ] Enviar el formulario de `/auth` o pulsar «JUGAR COMO INVITADO» navega a `/games`.
-- [ ] A 375 px de ancho `/` no tiene scroll horizontal y las grids de features, actividad y precios se muestran en 1 columna.
-- [ ] La consola del navegador no muestra errores de hidratación en `/`, `/games`, `/juegos/caida`, `/salon` y `/auth`.
+- [X] `npm run build` termina sin errores de TypeScript ni de compilación.
+- [X] `npm run lint` termina sin errores.
+- [X] `/` muestra el título «EL ARCADE / CLÁSICO ESTÁ / DE VUELTA» y las 7 secciones en el orden del Alcance.
+- [X] La sección «¿POR QUÉ ARCADE VAULT?» muestra 4 tarjetas y «JUEGOS DISPONIBLES AHORA» muestra exactamente 6 mini-tarjetas.
+- [X] Pulsar una mini-tarjeta navega a `/juegos/<id>` del juego correspondiente.
+- [X] «EXPLORAR JUEGOS», «VER TODOS LOS JUEGOS →» e «INSERTAR MONEDA →» navegan a `/games`.
+- [X] «CREAR CUENTA» y «EMPEZAR GRATIS →» navegan a `/auth`; «VER SALÓN →» navega a `/salon`.
+- [X] «ÚLTIMAS PUNTUACIONES» muestra 7 filas y «TOP JUGADORES · HOY» muestra 5 filas, con la primera marcada como `top1`.
+- [X] Las secciones con clase `.reveal` empiezan ocultas y se muestran al entrar en el viewport al hacer scroll.
+- [X] `/games` muestra la Biblioteca con 8 tarjetas, el buscador y los chips funcionando igual que en el SPEC 01.
+- [X] La nav muestra «Inicio», «Biblioteca» y «Salón de la Fama»; resalta «Inicio» solo en `/`, «Biblioteca» en `/games` y `/juegos/*`, y «Salón de la Fama» en `/salon`.
+- [X] La nav no contiene el enlace «Acerca de».
+- [X] VOLVER AL VAULT (detalle), SALIR (reproductor tras fin de juego) y el botón de vuelta del Salón navegan a `/games`.
+- [X] Enviar el formulario de `/auth` o pulsar «JUGAR COMO INVITADO» navega a `/games`.
+- [X] A 375 px de ancho `/` no tiene scroll horizontal y las grids de features, actividad y precios se muestran en 1 columna.
+- [X] La consola del navegador no muestra errores de hidratación en `/`, `/games`, `/juegos/caida`, `/salon` y `/auth`.
 
 ---
 
