@@ -1,6 +1,6 @@
 # SPEC 02 — Home (landing page) y mudanza de la Biblioteca a `/games`
 
-> **Status:** Borrador
+> **Status:** Aprobado
 > **Depends on:** SPEC 01
 > **Date:** 2026-11-06
 > **Objective:** Convertir `/` en la landing page del prototipo `references/templates/home-about/home.jsx` y mover la Biblioteca actual a `/games`.
