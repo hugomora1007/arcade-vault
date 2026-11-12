@@ -1,6 +1,6 @@
 # SPEC 03 — Página «Acerca de» y formulario de contacto con Resend
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 01, SPEC 02
 > **Date:** 2026-11-11
 > **Objective:** Implementar la ruta `/about` idéntica al prototipo `references/templates/home-about/about.jsx` y hacer que su formulario de contacto envíe un correo real con Resend mediante una Server Action.
@@ -115,22 +115,22 @@ Antes del paso 1 se debe leer en `node_modules/next/dist/docs/` la guía de App 
 
 ## Acceptance criteria
 
-- [ ] `npm run build` termina sin errores de TypeScript ni de compilación.
-- [ ] `npm run lint` termina sin errores.
-- [ ] `/about` muestra el título «ACERCA DE ARCADE VAULT», el texto de misión y 3 highlights (HEART, BROWSER, PLANT).
-- [ ] `/about` muestra el divisor con 24 píxeles y la sección «CONTÁCTANOS» con 3 tips.
-- [ ] El divisor y la sección de contacto empiezan ocultos y se muestran al entrar en el viewport.
-- [ ] La nav muestra «Acerca de» en la barra y en el panel móvil, y lo resalta solo en `/about`.
-- [ ] Enviar el formulario con algún campo vacío no llama a Resend y aplica el efecto `shake`.
-- [ ] Enviar con datos válidos entrega un correo en `CONTACT_TO_EMAIL` con asunto `[Arcade Vault] Mensaje de <nombre>`, el nombre, el correo y el mensaje en el cuerpo, y `Reply-To` igual al correo del visitante.
-- [ ] Tras un envío correcto se muestra la terminal «MENSAJE RECIBIDO… GRACIAS, <NOMBRE EN MAYÚSCULAS>.» y «ENVIAR OTRO MENSAJE» vuelve al formulario vacío.
-- [ ] Durante el envío el botón está deshabilitado y muestra «ENVIANDO…».
-- [ ] Con `RESEND_API_KEY` inválida o ausente se muestra un mensaje de error en el formulario, los campos conservan lo escrito y no aparece la terminal de éxito.
-- [ ] Una petición con el honeypot `website` relleno no envía ningún correo.
-- [ ] Un correo sin formato válido, un mensaje de más de 2000 caracteres o un nombre de más de 80 son rechazados por el servidor con mensaje de error.
-- [ ] `RESEND_API_KEY` no aparece en el HTML, en el bundle del cliente ni en `git status`.
-- [ ] A 375 px de ancho `/about` no tiene scroll horizontal y la grid de contacto se muestra en 1 columna.
-- [ ] La consola del navegador no muestra errores de hidratación en `/about`, `/`, `/games` y `/salon`.
+- [X] `npm run build` termina sin errores de TypeScript ni de compilación.
+- [X] `npm run lint` termina sin errores.
+- [X] `/about` muestra el título «ACERCA DE ARCADE VAULT», el texto de misión y 3 highlights (HEART, BROWSER, PLANT).
+- [X] `/about` muestra el divisor con 24 píxeles y la sección «CONTÁCTANOS» con 3 tips.
+- [X] El divisor y la sección de contacto empiezan ocultos y se muestran al entrar en el viewport.
+- [X] La nav muestra «Acerca de» en la barra y en el panel móvil, y lo resalta solo en `/about`.
+- [X] Enviar el formulario con algún campo vacío no llama a Resend y aplica el efecto `shake`.
+- [X] Enviar con datos válidos entrega un correo en `CONTACT_TO_EMAIL` con asunto `[Arcade Vault] Mensaje de <nombre>`, el nombre, el correo y el mensaje en el cuerpo, y `Reply-To` igual al correo del visitante.
+- [X] Tras un envío correcto se muestra la terminal «MENSAJE RECIBIDO… GRACIAS, <NOMBRE EN MAYÚSCULAS>.» y «ENVIAR OTRO MENSAJE» vuelve al formulario vacío.
+- [X] Durante el envío el botón está deshabilitado y muestra «ENVIANDO…».
+- [X] Con `RESEND_API_KEY` inválida o ausente se muestra un mensaje de error en el formulario, los campos conservan lo escrito y no aparece la terminal de éxito.
+- [X] Una petición con el honeypot `website` relleno no envía ningún correo.
+- [X] Un correo sin formato válido, un mensaje de más de 2000 caracteres o un nombre de más de 80 son rechazados por el servidor con mensaje de error.
+- [X] `RESEND_API_KEY` no aparece en el HTML, en el bundle del cliente ni en `git status`.
+- [X] A 375 px de ancho `/about` no tiene scroll horizontal y la grid de contacto se muestra en 1 columna.
+- [X] La consola del navegador no muestra errores de hidratación en `/about`, `/`, `/games` y `/salon`.
 
 ---
 
