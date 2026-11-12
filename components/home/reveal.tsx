@@ -6,6 +6,9 @@ import type { ReactNode } from "react";
 interface RevealProps {
   children: ReactNode;
   className?: string;
+  /** Elemento HTML a renderizar. Por defecto `section`. */
+  as?: "section" | "div";
+  "aria-hidden"?: boolean;
 }
 
 /**
@@ -13,8 +16,13 @@ interface RevealProps {
  * en el viewport (IntersectionObserver, threshold 0.12). Con
  * prefers-reduced-motion se muestra de inmediato, sin animación.
  */
-export default function Reveal({ children, className = "" }: RevealProps) {
-  const ref = useRef<HTMLElement>(null);
+export default function Reveal({
+  children,
+  className = "",
+  as: Tag = "section",
+  "aria-hidden": ariaHidden,
+}: RevealProps) {
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current;
@@ -44,8 +52,12 @@ export default function Reveal({ children, className = "" }: RevealProps) {
   }, []);
 
   return (
-    <section ref={ref} className={`${className} reveal`.trim()}>
+    <Tag
+      ref={ref}
+      className={`${className} reveal`.trim()}
+      aria-hidden={ariaHidden}
+    >
       {children}
-    </section>
+    </Tag>
   );
 }
