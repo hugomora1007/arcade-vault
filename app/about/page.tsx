@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ContactSection from "@/components/about/contact-section";
 import HighlightIcon, {
   type HighlightIconKind,
 } from "@/components/about/highlight-icon";
@@ -59,7 +60,10 @@ export default function AboutPage() {
         <div className="div-bar" />
       </Reveal>
 
-      {/* CONTACT: se añade en los pasos 5–7 */}
+      {/* CONTACT */}
+      <Reveal className="about-contact">
+        <ContactSection />
+      </Reveal>
     </div>
   );
 }
