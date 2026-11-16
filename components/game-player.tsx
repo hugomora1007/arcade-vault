@@ -1,34 +1,79 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import AsteroidsCanvas from "@/components/games/asteroids-canvas";
 import type { Game } from "@/lib/games";
+import type {
+  AsteroidsEngine,
+  AsteroidsSnapshot,
+} from "@/lib/games/asteroids/types";
 
 const INITIAL_LIVES = 3;
 const POINTS_PER_LEVEL = 2500;
+const REAL_ASTEROIDS_ID = "asteroides";
+
+const INITIAL_SNAPSHOT: AsteroidsSnapshot = {
+  score: 0,
+  lives: INITIAL_LIVES,
+  level: 1,
+  phase: "playing",
+};
 
 export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> }) {
-  const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(INITIAL_LIVES);
+  // Solo "asteroides" usa un motor real; el resto conserva la simulación.
+  const isReal = game.id === REAL_ASTEROIDS_ID;
+  const engineRef = useRef<AsteroidsEngine | null>(null);
+  const [snapshot, setSnapshot] = useState<AsteroidsSnapshot>(INITIAL_SNAPSHOT);
+
+  const [fakeScore, setScore] = useState(0);
+  const [fakeLives, setLives] = useState(INITIAL_LIVES);
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
   const [name, setName] = useState("INVITADO");
   const [saved, setSaved] = useState(false);
 
-  // El nivel se deriva de la puntuación (se reinicia solo con el score).
-  const level = 1 + Math.floor(score / POINTS_PER_LEVEL);
+  const score = isReal ? snapshot.score : fakeScore;
+  const lives = isReal ? snapshot.lives : fakeLives;
+  // En la simulación el nivel se deriva de la puntuación.
+  const level = isReal
+    ? snapshot.level
+    : 1 + Math.floor(fakeScore / POINTS_PER_LEVEL);
+
+  const handleReady = useCallback((engine: AsteroidsEngine) => {
+    engineRef.current = engine;
+  }, []);
+  const handleGameOver = useCallback(() => {
+    setPaused(false);
+    setOver(true);
+  }, []);
 
   // Temporizador falso: el azar vive solo aquí, dentro del efecto.
   useEffect(() => {
-    if (over || paused) return;
+    if (isReal || over || paused) return;
     const t = setInterval(
       () => setScore((s) => s + Math.floor(10 + Math.random() * 90)),
       220,
     );
     return () => clearInterval(t);
-  }, [over, paused]);
+  }, [isReal, over, paused]);
+
+  const togglePause = () => {
+    const next = !paused;
+    setPaused(next);
+    if (isReal) {
+      if (next) engineRef.current?.pause();
+      else engineRef.current?.resume();
+    }
+  };
+
+  const endGame = () => {
+    if (isReal) engineRef.current?.end();
+    else setOver(true);
+  };
 
   const restart = () => {
+    if (isReal) engineRef.current?.restart();
     setScore(0);
     setLives(INITIAL_LIVES);
     setPaused(false);
@@ -63,14 +108,14 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
           <button
             type="button"
             className="btn yellow"
-            onClick={() => setPaused((p) => !p)}
+            onClick={togglePause}
           >
             {paused ? "REANUDAR" : "PAUSA"}
           </button>
           <button
             type="button"
             className="btn magenta"
-            onClick={() => setOver(true)}
+            onClick={endGame}
           >
             FIN
           </button>
@@ -82,13 +127,21 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
 
       <div className="crt">
         <div className="crt-screen">
-          <div className="game-arena">
-            <div className="grid-floor" />
-            <div className="enemy e1" />
-            <div className="enemy e2" />
-            <div className="enemy e3" />
-            <div className="player-ship" />
-          </div>
+          {isReal ? (
+            <AsteroidsCanvas
+              onReady={handleReady}
+              onChange={setSnapshot}
+              onGameOver={handleGameOver}
+            />
+          ) : (
+            <div className="game-arena">
+              <div className="grid-floor" />
+              <div className="enemy e1" />
+              <div className="enemy e2" />
+              <div className="enemy e3" />
+              <div className="player-ship" />
+            </div>
+          )}
           {paused && (
             <div
               className="crt-content"
