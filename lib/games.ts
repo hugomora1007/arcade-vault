@@ -109,6 +109,17 @@ export const GAMES: Game[] = [
     best: 24,
     plays: "4.2K",
   },
+  {
+    id: "asteroides",
+    title: "ASTEROIDES",
+    short: "Sobrevive al campo de asteroides y rompe cada roca.",
+    long: "Pilota tu nave por un campo de asteroides donde el espacio no tiene bordes: lo que sale por un lado aparece por el otro. Rota, propulsa y dispara para partir las rocas grandes en medianas y las medianas en pequeñas. Tienes tres vidas y unos instantes de invencibilidad al reaparecer.",
+    cat: "SHOOTER",
+    cover: "cover-rocas",
+    color: "cyan",
+    best: 0,
+    plays: "0",
+  },
 ];
 
 export const CATS: ["TODOS", ...Category[]] = [
