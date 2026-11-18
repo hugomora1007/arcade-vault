@@ -898,6 +898,31 @@ a { color: inherit; text-decoration: none; }
 .hall-head p { color: var(--ink-dim); margin: 12px 0 0; letter-spacing: 0.1em; }
 
 .hall-tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 22px; }
+a.chip { display: inline-block; text-decoration: none; }
+.podium-slot.empty { opacity: 0.45; }
+.hall-state {
+  text-align: center;
+  padding: 64px 20px;
+  border: 1px dashed var(--line);
+  background: var(--bg-2);
+}
+.hall-state .hs-title {
+  font-family: var(--pixel);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--yellow);
+  text-shadow: 0 0 8px rgba(245,255,0,0.45);
+}
+.hall-state.error { border-color: var(--magenta); }
+.hall-state.error .hs-title { color: var(--magenta); text-shadow: 0 0 8px rgba(255,0,110,0.5); }
+.hall-state .hs-text {
+  margin: 12px auto 0;
+  max-width: 46ch;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+}
 .podium {
   display: grid;
   grid-template-columns: 1fr 1.2fr 1fr;
