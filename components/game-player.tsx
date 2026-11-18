@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AsteroidsCanvas from "@/components/games/asteroids-canvas";
+import { saveScore } from "@/app/juegos/[id]/jugar/actions";
 import type { Game } from "@/lib/games";
 import type {
   AsteroidsEngine,
@@ -12,6 +13,13 @@ import type {
 const INITIAL_LIVES = 3;
 const POINTS_PER_LEVEL = 2500;
 const REAL_ASTEROIDS_ID = "asteroides";
+const INITIALS_PATTERN = /^[A-Z0-9]{3}$/;
+
+const ERROR_MESSAGES = {
+  INITIALS: "Escribe 3 letras o números, por ejemplo ABC.",
+  NO_SCORE: "Necesitas al menos 1 punto para entrar en el ranking.",
+  FAILED: "No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.",
+} as const;
 
 const INITIAL_SNAPSHOT: AsteroidsSnapshot = {
   score: 0,
@@ -32,6 +40,12 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
   const [over, setOver] = useState(false);
   const [name, setName] = useState("INVITADO");
   const [saved, setSaved] = useState(false);
+  // Solo "asteroides" persiste: iniciales propias (3 caracteres) y estado de guardado.
+  const [initials, setInitials] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  // Evita un segundo envío en el mismo instante, antes de que `saving` se refleje.
+  const savingRef = useRef(false);
 
   const score = isReal ? snapshot.score : fakeScore;
   const lives = isReal ? snapshot.lives : fakeLives;
@@ -79,6 +93,48 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
     setPaused(false);
     setOver(false);
     setSaved(false);
+    setSaving(false);
+    setSaveError(null);
+    savingRef.current = false;
+  };
+
+  const handleSave = async () => {
+    if (savingRef.current) return;
+    if (!isReal) {
+      // Simulación: solo feedback, no se persiste nada.
+      setSaved(true);
+      return;
+    }
+
+    const clean = initials.trim().toUpperCase();
+    if (!INITIALS_PATTERN.test(clean)) {
+      setSaveError(ERROR_MESSAGES.INITIALS);
+      return;
+    }
+    if (score < 1) {
+      setSaveError(ERROR_MESSAGES.NO_SCORE);
+      return;
+    }
+
+    savingRef.current = true;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const result = await saveScore(game.id, clean, score);
+      if (result.ok) setSaved(true);
+      else
+        setSaveError(
+          result.error === "INVALID"
+            ? ERROR_MESSAGES.INITIALS
+            : ERROR_MESSAGES.FAILED,
+        );
+    } catch {
+      // Sin red u otro fallo del transporte: se puede reintentar.
+      setSaveError(ERROR_MESSAGES.FAILED);
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
+    }
   };
 
   return (
@@ -180,24 +236,37 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{score.toLocaleString("es-ES")}</div>
             {!saved ? (
-              <div className="input-row">
-                <input
-                  value={name}
-                  onChange={(e) =>
-                    setName(e.target.value.toUpperCase().slice(0, 10))
-                  }
-                  placeholder="TUS INICIALES"
-                  aria-label="Tus iniciales"
-                />
-                {/* Solo muestra el feedback: no se persiste nada. */}
-                <button
-                  type="button"
-                  className="btn yellow"
-                  onClick={() => setSaved(true)}
-                >
-                  GUARDAR PUNTUACIÓN
-                </button>
-              </div>
+              <>
+                <div className="input-row">
+                  <input
+                    value={isReal ? initials : name}
+                    onChange={(e) =>
+                      isReal
+                        ? setInitials(e.target.value.toUpperCase().slice(0, 3))
+                        : setName(e.target.value.toUpperCase().slice(0, 10))
+                    }
+                    maxLength={isReal ? 3 : undefined}
+                    placeholder="TUS INICIALES"
+                    aria-label="Tus iniciales"
+                    aria-invalid={saveError ? true : undefined}
+                    aria-describedby={saveError ? "save-error" : undefined}
+                    disabled={saving}
+                  />
+                  <button
+                    type="button"
+                    className="btn yellow"
+                    onClick={handleSave}
+                    disabled={saving}
+                  >
+                    {saving ? "GUARDANDO…" : "GUARDAR PUNTUACIÓN"}
+                  </button>
+                </div>
+                {saveError && (
+                  <p id="save-error" className="save-error" role="alert">
+                    {saveError}
+                  </p>
+                )}
+              </>
             ) : (
               <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
             )}
