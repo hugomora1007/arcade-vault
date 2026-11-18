@@ -1,4 +1,5 @@
 import Link from "next/link";
+import RankingState from "@/components/ranking-state";
 import type { Game } from "@/lib/games";
 import type { ScoreRow } from "@/lib/scores";
 interface HallOfFameProps {
@@ -72,20 +73,9 @@ export default function HallOfFame({
         ))}
       </nav>
       {error ? (
-        <div className="hall-state error" role="alert">
-          <div className="hs-title">NO SE PUDO CARGAR EL RANKING</div>
-          <p className="hs-text">
-            Algo falló al leer las puntuaciones. Recarga la página en unos
-            minutos.
-          </p>
-        </div>
+        <RankingState kind="error" />
       ) : rows.length === 0 ? (
-        <div className="hall-state" role="status">
-          <div className="hs-title">SIN PUNTUACIONES TODAVÍA</div>
-          <p className="hs-text">
-            Nadie ha guardado una puntuación en este juego.
-          </p>
-        </div>
+        <RankingState kind="empty" />
       ) : (
         <>
           <div className="podium">

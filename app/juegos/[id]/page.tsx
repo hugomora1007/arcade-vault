@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getGame, getGames } from "@/lib/db/games";
-import { seededScores } from "@/lib/scores";
+import RankingState from "@/components/ranking-state";
+import { getGame, getGames, getTopScores } from "@/lib/db/games";
+import type { ScoreRow } from "@/lib/scores";
 
 export async function generateStaticParams() {
   const games = await getGames();
@@ -17,7 +18,14 @@ export default async function GameDetailPage({
   const game = await getGame(id);
   if (!game) notFound();
 
-  const scores = seededScores(id.length * 17 + 3, 10);
+  // Si el ranking falla, el resto del detalle se sigue mostrando.
+  let scores: ScoreRow[] = [];
+  let rankingError = false;
+  try {
+    scores = await getTopScores(game.id, 10);
+  } catch {
+    rankingError = true;
+  }
 
   return (
     <div className="av-detail fade-in">
@@ -78,9 +86,14 @@ export default async function GameDetailPage({
       <aside>
         <div className="leaderboard">
           <h3>MEJORES PUNTUACIONES</h3>
+          {rankingError ? (
+            <RankingState kind="error" />
+          ) : scores.length === 0 ? (
+            <RankingState kind="empty" />
+          ) : null}
           {scores.map((r, i) => (
             <div
-              key={r.name}
+              key={r.rank}
               className={
                 "lb-row" +
                 (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")

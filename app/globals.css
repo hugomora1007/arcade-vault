@@ -914,6 +914,7 @@ a.chip { display: inline-block; text-decoration: none; }
   text-shadow: 0 0 8px rgba(245,255,0,0.45);
 }
 .hall-state.error { border-color: var(--magenta); }
+.leaderboard .hall-state { padding: 32px 16px; }
 .hall-state.error .hs-title { color: var(--magenta); text-shadow: 0 0 8px rgba(255,0,110,0.5); }
 .hall-state .hs-text {
   margin: 12px auto 0;
