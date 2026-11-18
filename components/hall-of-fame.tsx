@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { GAMES } from "@/lib/games";
+import type { Game } from "@/lib/games";
 import { seededScores } from "@/lib/scores";
 
-export default function HallOfFame() {
-  const [tab, setTab] = useState(GAMES[0].id);
+export default function HallOfFame({ games }: { games: Game[] }) {
+  const [tab, setTab] = useState(games[0].id);
   const rows = useMemo(() => seededScores(tab.length * 23 + 7, 12), [tab]);
 
   return (
@@ -19,7 +19,7 @@ export default function HallOfFame() {
       </div>
 
       <div className="hall-tabs">
-        {GAMES.map((g) => (
+        {games.map((g) => (
           <button
             key={g.id}
             type="button"

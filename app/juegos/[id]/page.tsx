@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { GAMES } from "@/lib/games";
+import { getGame, getGames } from "@/lib/db/games";
 import { seededScores } from "@/lib/scores";
 
-export function generateStaticParams() {
-  return GAMES.map((g) => ({ id: g.id }));
+export async function generateStaticParams() {
+  const games = await getGames();
+  return games.map((g) => ({ id: g.id }));
 }
 
 export default async function GameDetailPage({
@@ -13,7 +14,7 @@ export default async function GameDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const game = GAMES.find((g) => g.id === id);
+  const game = await getGame(id);
   if (!game) notFound();
 
   const scores = seededScores(id.length * 17 + 3, 10);
@@ -36,7 +37,7 @@ export default async function GameDetailPage({
           <div className="stat-strip">
             <div>
               <div className="l">Partidas</div>
-              <div className="v">{game.plays}</div>
+              <div className="v">{game.plays.toLocaleString("es-ES")}</div>
             </div>
             <div>
               <div className="l">Mejor global</div>
