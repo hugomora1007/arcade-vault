@@ -2,7 +2,7 @@ export interface ScoreRow {
   rank: number;
   name: string;
   score: number;
-  /** "DD/MM/2026" */
+  /** "DD/MM/AAAA" */
   date: string;
 }
 
