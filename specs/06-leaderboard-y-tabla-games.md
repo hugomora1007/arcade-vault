@@ -1,6 +1,6 @@
 # SPEC 06 — Tabla `games`, puntuaciones reales y leaderboard
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 01, SPEC 04, SPEC 05
 > **Date:** 2026-11-17
 > **Objective:** Crear en Supabase las tablas `games` y `scores`, convertir la BD en la fuente única del catálogo y del ranking, y permitir guardar de forma anónima (con iniciales) las puntuaciones de Asteroides para mostrarlas en `/salon` y en el detalle de cada juego.
