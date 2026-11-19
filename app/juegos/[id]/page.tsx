@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import LoadError from "@/components/load-error";
 import RankingState from "@/components/ranking-state";
-import { getGame, getGames, getTopScores } from "@/lib/db/games";
+import {
+  getGame,
+  getStaticGameParams,
+  getTopScores,
+} from "@/lib/db/games";
+import type { Game } from "@/lib/games";
 import type { ScoreRow } from "@/lib/scores";
 
 export async function generateStaticParams() {
-  const games = await getGames();
-  return games.map((g) => ({ id: g.id }));
+  return getStaticGameParams();
 }
 
 export default async function GameDetailPage({
@@ -15,7 +20,12 @@ export default async function GameDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const game = await getGame(id);
+  let game: Game | null = null;
+  try {
+    game = await getGame(id);
+  } catch {
+    return <LoadError />;
+  }
   if (!game) notFound();
 
   // Si el ranking falla, el resto del detalle se sigue mostrando.

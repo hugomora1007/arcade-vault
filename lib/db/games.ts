@@ -47,6 +47,24 @@ export async function getGames(): Promise<Game[]> {
   const statsById = new Map(stats.data.map((s) => [s.game_id, s]));
   return games.data.map((g) => toGame(g, statsById.get(g.id)));
 }
+/**
+ * Params para `generateStaticParams` de `/juegos/[id]` y `/juegos/[id]/jugar`.
+ *
+ * Si el catálogo no se puede leer devuelve un id de relleno para que la ruta
+ * siga respondiendo (con su estado de error) en lugar de un 500. Durante
+ * `next build` sí relanza el error: un build con el catálogo caído no debe
+ * publicarse. Con `cacheComponents` se exige al menos un param.
+ */
+export async function getStaticGameParams(): Promise<{ id: string }[]> {
+  try {
+    const games = await getGames();
+    return games.map((g) => ({ id: g.id }));
+  } catch (error) {
+    if (process.env.NEXT_PHASE === "phase-production-build") throw error;
+    return [{ id: "sin-catalogo" }];
+  }
+}
+
 /** Un juego por id, o `null` si no existe. */
 export async function getGame(id: string): Promise<Game | null> {
   "use cache";
