@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { GAMES } from "@/lib/games";
-import { seededScores } from "@/lib/scores";
+import LoadError from "@/components/load-error";
+import RankingState from "@/components/ranking-state";
+import {
+  getGame,
+  getStaticGameParams,
+  getTopScores,
+} from "@/lib/db/games";
+import type { Game } from "@/lib/games";
+import type { ScoreRow } from "@/lib/scores";
 
-export function generateStaticParams() {
-  return GAMES.map((g) => ({ id: g.id }));
+export async function generateStaticParams() {
+  return getStaticGameParams();
 }
 
 export default async function GameDetailPage({
@@ -13,10 +20,22 @@ export default async function GameDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const game = GAMES.find((g) => g.id === id);
+  let game: Game | null = null;
+  try {
+    game = await getGame(id);
+  } catch {
+    return <LoadError />;
+  }
   if (!game) notFound();
 
-  const scores = seededScores(id.length * 17 + 3, 10);
+  // Si el ranking falla, el resto del detalle se sigue mostrando.
+  let scores: ScoreRow[] = [];
+  let rankingError = false;
+  try {
+    scores = await getTopScores(game.id, 10);
+  } catch {
+    rankingError = true;
+  }
 
   return (
     <div className="av-detail fade-in">
@@ -36,7 +55,7 @@ export default async function GameDetailPage({
           <div className="stat-strip">
             <div>
               <div className="l">Partidas</div>
-              <div className="v">{game.plays}</div>
+              <div className="v">{game.plays.toLocaleString("es-ES")}</div>
             </div>
             <div>
               <div className="l">Mejor global</div>
@@ -77,9 +96,14 @@ export default async function GameDetailPage({
       <aside>
         <div className="leaderboard">
           <h3>MEJORES PUNTUACIONES</h3>
+          {rankingError ? (
+            <RankingState kind="error" />
+          ) : scores.length === 0 ? (
+            <RankingState kind="empty" />
+          ) : null}
           {scores.map((r, i) => (
             <div
-              key={r.name}
+              key={r.rank}
               className={
                 "lb-row" +
                 (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")

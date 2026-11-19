@@ -1,14 +1,57 @@
-"use client";
-
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { GAMES } from "@/lib/games";
-import { seededScores } from "@/lib/scores";
-
-export default function HallOfFame() {
-  const [tab, setTab] = useState(GAMES[0].id);
-  const rows = useMemo(() => seededScores(tab.length * 23 + 7, 12), [tab]);
-
+import RankingState from "@/components/ranking-state";
+import type { Game } from "@/lib/games";
+import type { ScoreRow } from "@/lib/scores";
+interface HallOfFameProps {
+  games: Game[];
+  /** Id del juego seleccionado (pestaña activa). */
+  selectedId: string;
+  /** Top de puntuaciones del juego seleccionado. */
+  rows: ScoreRow[];
+  /** `true` si el catálogo o el ranking no se pudieron cargar. */
+  error?: boolean;
+}
+/** Huecos `---` cuando hay menos de 3 puntuaciones. */
+function PodiumSlot({
+  row,
+  place,
+  tone,
+}: {
+  row: ScoreRow | undefined;
+  place: "01" | "02" | "03";
+  tone: "gold" | "silver" | "bronze";
+}) {
+  const isGold = tone === "gold";
+  return (
+    <div className={`podium-slot ${tone}${row ? "" : " empty"}`}>
+      {isGold && (
+        <div
+          className="pixel"
+          style={{ fontSize: 9, color: "var(--gold)", letterSpacing: "0.18em" }}
+        >
+          CAMPEÓN
+        </div>
+      )}
+      <div
+        className="rank-num"
+        style={isGold ? { fontSize: 36, marginTop: 4 } : undefined}
+      >
+        {place}
+      </div>
+      <div className="name">{row ? row.name : "---"}</div>
+      <div className="score" style={isGold ? { fontSize: 20 } : undefined}>
+        {row ? row.score.toLocaleString("es-ES") : "---"}
+      </div>
+      <div className="date">{row ? row.date : "---"}</div>
+    </div>
+  );
+}
+export default function HallOfFame({
+  games,
+  selectedId,
+  rows,
+  error = false,
+}: HallOfFameProps) {
   return (
     <div className="av-hall fade-in">
       <div className="hall-head">
@@ -17,74 +60,60 @@ export default function HallOfFame() {
           LOS NOMBRES QUE NUNCA SE BORRAN DE LA PANTALLA
         </p>
       </div>
-
-      <div className="hall-tabs">
-        {GAMES.map((g) => (
-          <button
+      <nav className="hall-tabs" aria-label="Juegos">
+        {games.map((g) => (
+          <Link
             key={g.id}
-            type="button"
-            className={"chip" + (tab === g.id ? " active" : "")}
-            onClick={() => setTab(g.id)}
+            href={`/salon?juego=${g.id}`}
+            className={"chip" + (selectedId === g.id ? " active" : "")}
+            aria-current={selectedId === g.id ? "page" : undefined}
           >
             {g.title}
-          </button>
+          </Link>
         ))}
-      </div>
-
-      <div className="podium">
-        <div className="podium-slot silver">
-          <div className="rank-num">02</div>
-          <div className="name">{rows[1].name}</div>
-          <div className="score">{rows[1].score.toLocaleString("es-ES")}</div>
-          <div className="date">{rows[1].date}</div>
-        </div>
-        <div className="podium-slot gold">
-          <div
-            className="pixel"
-            style={{ fontSize: 9, color: "var(--gold)", letterSpacing: "0.18em" }}
-          >
-            CAMPEÓN
+      </nav>
+      {error ? (
+        <RankingState kind="error" />
+      ) : rows.length === 0 ? (
+        <RankingState kind="empty" />
+      ) : (
+        <>
+          <div className="podium">
+            <PodiumSlot row={rows[1]} place="02" tone="silver" />
+            <PodiumSlot row={rows[0]} place="01" tone="gold" />
+            <PodiumSlot row={rows[2]} place="03" tone="bronze" />
           </div>
-          <div className="rank-num" style={{ fontSize: 36, marginTop: 4 }}>
-            01
+          <div className="hall-table">
+            <div className="th">
+              <div>RANGO</div>
+              <div>JUGADOR</div>
+              <div>PUNTUACIÓN</div>
+              <div>FECHA</div>
+            </div>
+            {rows.map((r, i) => (
+              <div
+                key={`${selectedId}-${r.rank}`}
+                className={
+                  "tr" +
+                  (i === 0
+                    ? " top1"
+                    : i === 1
+                      ? " top2"
+                      : i === 2
+                        ? " top3"
+                        : "")
+                }
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="rk">#{String(r.rank).padStart(2, "0")}</div>
+                <div className="pl">{r.name}</div>
+                <div className="sc">{r.score.toLocaleString("es-ES")}</div>
+                <div className="dt">{r.date}</div>
+              </div>
+            ))}
           </div>
-          <div className="name">{rows[0].name}</div>
-          <div className="score" style={{ fontSize: 20 }}>
-            {rows[0].score.toLocaleString("es-ES")}
-          </div>
-          <div className="date">{rows[0].date}</div>
-        </div>
-        <div className="podium-slot bronze">
-          <div className="rank-num">03</div>
-          <div className="name">{rows[2].name}</div>
-          <div className="score">{rows[2].score.toLocaleString("es-ES")}</div>
-          <div className="date">{rows[2].date}</div>
-        </div>
-      </div>
-
-      <div className="hall-table">
-        <div className="th">
-          <div>RANGO</div>
-          <div>JUGADOR</div>
-          <div>PUNTUACIÓN</div>
-          <div>FECHA</div>
-        </div>
-        {rows.map((r, i) => (
-          <div
-            key={`${tab}-${r.name}`}
-            className={
-              "tr" + (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")
-            }
-            style={{ animationDelay: `${i * 50}ms` }}
-          >
-            <div className="rk">#{String(r.rank).padStart(2, "0")}</div>
-            <div className="pl">{r.name}</div>
-            <div className="sc">{r.score.toLocaleString("es-ES")}</div>
-            <div className="dt">{r.date}</div>
-          </div>
-        ))}
-      </div>
-
+        </>
+      )}
       <div style={{ textAlign: "center", marginTop: 32 }}>
         <Link href="/games" className="btn lg">
           VOLVER A LA BIBLIOTECA

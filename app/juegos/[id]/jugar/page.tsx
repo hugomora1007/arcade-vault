@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
 import GamePlayer from "@/components/game-player";
-import { GAMES } from "@/lib/games";
+import LoadError from "@/components/load-error";
+import { getGame, getStaticGameParams } from "@/lib/db/games";
+import type { Game } from "@/lib/games";
 
-export function generateStaticParams() {
-  return GAMES.map((g) => ({ id: g.id }));
+export async function generateStaticParams() {
+  return getStaticGameParams();
 }
 
 export default async function PlayPage({
@@ -12,7 +14,12 @@ export default async function PlayPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const game = GAMES.find((g) => g.id === id);
+  let game: Game | null = null;
+  try {
+    game = await getGame(id);
+  } catch {
+    return <LoadError />;
+  }
   if (!game) notFound();
 
   return <GamePlayer game={{ id: game.id, title: game.title }} />;
