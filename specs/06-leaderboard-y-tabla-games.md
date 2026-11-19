@@ -49,7 +49,7 @@ El SPEC 04 dejó Supabase conectado pero con el esquema `public` vacío, y el SP
 
 ## Data model
 
-Migración `supabase/migrations/20261117000000_games_and_scores.sql`:
+Migración `supabase/migrations/20261118021038_games_and_scores.sql`:
 
 ```sql
 create table public.games (
@@ -148,7 +148,7 @@ Convenciones:
 
 Antes del paso 1 se debe leer en `node_modules/next/dist/docs/` las guías de App Router sobre Server Actions, `"use cache"`/`cacheComponents`, `generateStaticParams` y `searchParams` (Next.js 16), y en el MCP de Supabase (`search_docs`) la guía de RLS y vistas con `security_invoker`. Se invoca `/frontend-design` solo para los estados vacío y de error del ranking y del modal; el diseño existente no cambia.
 
-1. **Migración.** Crear `supabase/migrations/20261117000000_games_and_scores.sql` con el data model y la siembra de los 9 juegos (copiando literalmente `lib/games.ts`) y aplicarla con `apply_migration` del MCP. Verificación: `list_tables` muestra `games` (9 filas) y `scores` con RLS activo; `get_advisors` (security) no reporta tablas sin RLS ni la vista sin `security_invoker`.
+1. **Migración.** Crear `supabase/migrations/20261118021038_games_and_scores.sql` con el data model y la siembra de los 9 juegos (copiando literalmente `lib/games.ts`) y aplicarla con `apply_migration` del MCP. Verificación: `list_tables` muestra `games` (9 filas) y `scores` con RLS activo; `get_advisors` (security) no reporta tablas sin RLS ni la vista sin `security_invoker`.
 2. **Tipos generados.** Regenerar `lib/supabase/database.types.ts` con `generate_typescript_types`. Verificación: `Database` incluye `games`, `scores` y `game_stats`; `npx tsc --noEmit` sin errores.
 3. **Capa de datos.** Crear `lib/db/games.ts` (`getGames`, `getGame`, `getTopScores`) y ajustar `lib/scores.ts` y `lib/games.ts` a las firmas del data model sin eliminar aún `GAMES`. Si `generateStaticParams` necesita leer sin petición, añadir un cliente sin cookies (`lib/supabase/public.ts`) según indique la guía de `cacheComponents`. Verificación: `npx tsc --noEmit` sin errores; una consulta manual devuelve 9 juegos con `best = 0` y `plays = 0`.
 4. **Catálogo desde la BD.** Migrar home, `/games`, `/juegos/[id]` y `/juegos/[id]/jugar` a `getGames`/`getGame` (las páginas son Server Components y pasan los datos como props a `library.tsx`, `game-card.tsx`, `mini-card.tsx` y `game-player.tsx`). Eliminar `GAMES` y el helper de `plays` formateado. Verificación: las cuatro rutas se ven igual que antes salvo `best`/`plays` en 0; `/juegos/inexistente` devuelve 404; `grep` de `GAMES` en `app/`, `components/` y `lib/` solo da resultados en comentarios o ninguno.
@@ -164,7 +164,7 @@ Antes del paso 1 se debe leer en `node_modules/next/dist/docs/` las guías de Ap
 
 - [ ] `npm run build` termina sin errores de TypeScript ni de compilación.
 - [ ] `npm run lint` termina sin errores.
-- [ ] `supabase/migrations/20261117000000_games_and_scores.sql` existe y está aplicada: `list_migrations` la muestra.
+- [ ] `supabase/migrations/20261118021038_games_and_scores.sql` existe y está aplicada: `list_migrations` la muestra.
 - [ ] `list_tables` muestra `games` con 9 filas y `scores` con RLS activo en ambas tablas.
 - [ ] `get_advisors` (security) no reporta tablas sin RLS ni vistas `SECURITY DEFINER` para `games`, `scores` y `game_stats`.
 - [ ] Con la publishable key, un `update` o `delete` sobre `scores` desde la API no modifica ninguna fila.
