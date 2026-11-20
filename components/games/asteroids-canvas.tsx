@@ -1,19 +1,12 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { createAsteroidsEngine } from "@/lib/games/asteroids/engine";
-import type {
-  AsteroidsCallbacks,
-  AsteroidsEngine,
-} from "@/lib/games/asteroids/types";
+import type { GameCanvasProps } from "@/lib/games/registry";
 export default function AsteroidsCanvas({
   onReady,
   onChange,
   onGameOver,
-}: {
-  onReady: (engine: AsteroidsEngine) => void;
-  onChange: AsteroidsCallbacks["onChange"];
-  onGameOver: AsteroidsCallbacks["onGameOver"];
-}) {
+}: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Los callbacks viven en refs para no recrear el motor si cambian.
   const onReadyRef = useRef(onReady);

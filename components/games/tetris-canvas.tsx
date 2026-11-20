@@ -1,16 +1,12 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { createTetrisEngine } from "@/lib/games/tetris/engine";
-import type { TetrisCallbacks, TetrisEngine } from "@/lib/games/tetris/types";
+import type { GameCanvasProps } from "@/lib/games/registry";
 export default function TetrisCanvas({
   onReady,
   onChange,
   onGameOver,
-}: {
-  onReady: (engine: TetrisEngine) => void;
-  onChange: TetrisCallbacks["onChange"];
-  onGameOver: TetrisCallbacks["onGameOver"];
-}) {
+}: GameCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Los callbacks viven en refs para no recrear el motor si cambian.
   const onReadyRef = useRef(onReady);
