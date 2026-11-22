@@ -1,6 +1,6 @@
 # SPEC 07 — Tetris como juego real (`tetris`)
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 05, SPEC 06
 > **Date:** 2026-11-20
 > **Objective:** Portar `references/started-games/03-tetris` a un motor TypeScript con canvas, montarlo en `/juegos/tetris/jugar`, añadirlo al catálogo por migración y guardar sus puntuaciones en el leaderboard real.
