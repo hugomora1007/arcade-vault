@@ -1,6 +1,6 @@
 # SPEC 08 — Arkanoid como juego real (`arkanoid`)
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 05, SPEC 06, SPEC 07 (registro de juegos reales)
 > **Date:** 2026-11-22
 > **Objective:** Portar `references/started-games/04-arkanoid` a un motor TypeScript con canvas, montarlo en `/juegos/arkanoid/jugar`, añadirlo al catálogo por migración y guardar sus puntuaciones en el leaderboard real.
