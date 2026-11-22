@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import AsteroidsCanvas from "@/components/games/asteroids-canvas";
+import ArkanoidCanvas from "@/components/games/arkanoid-canvas";
 import TetrisCanvas from "@/components/games/tetris-canvas";
 export interface GameSnapshot {
   score: number;
@@ -32,5 +33,9 @@ export const REAL_GAMES: Record<
   tetris: {
     Canvas: TetrisCanvas,
     initialSnapshot: { score: 0, lives: 1, level: 1, phase: "playing" },
+  },
+  arkanoid: {
+    Canvas: ArkanoidCanvas,
+    initialSnapshot: { score: 0, lives: 3, level: 1, phase: "playing" },
   },
 };
