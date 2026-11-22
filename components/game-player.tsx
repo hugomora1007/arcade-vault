@@ -1,67 +1,66 @@
 "use client";
-
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import AsteroidsCanvas from "@/components/games/asteroids-canvas";
 import { saveScore } from "@/app/juegos/[id]/jugar/actions";
 import type { Game } from "@/lib/games";
-import type {
-  AsteroidsEngine,
-  AsteroidsSnapshot,
-} from "@/lib/games/asteroids/types";
-
+import {
+  REAL_GAMES,
+  type GameEngine,
+  type GameSnapshot,
+} from "@/lib/games/registry";
 const INITIAL_LIVES = 3;
 const POINTS_PER_LEVEL = 2500;
-const REAL_ASTEROIDS_ID = "asteroides";
 const INITIALS_PATTERN = /^[A-Z0-9]{3}$/;
-
 const ERROR_MESSAGES = {
   INITIALS: "Escribe 3 letras o números, por ejemplo ABC.",
   NO_SCORE: "Necesitas al menos 1 punto para entrar en el ranking.",
   FAILED: "No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.",
 } as const;
-
-const INITIAL_SNAPSHOT: AsteroidsSnapshot = {
+const FALLBACK_SNAPSHOT: GameSnapshot = {
   score: 0,
   lives: INITIAL_LIVES,
   level: 1,
   phase: "playing",
 };
-
-export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> }) {
-  // Solo "asteroides" usa un motor real; el resto conserva la simulación.
-  const isReal = game.id === REAL_ASTEROIDS_ID;
-  const engineRef = useRef<AsteroidsEngine | null>(null);
-  const [snapshot, setSnapshot] = useState<AsteroidsSnapshot>(INITIAL_SNAPSHOT);
-
+export default function GamePlayer({
+  game,
+}: {
+  game: Pick<Game, "id" | "title">;
+}) {
+  // Los juegos del registro usan un motor real; el resto conserva la simulación.
+  const realGame = Object.hasOwn(REAL_GAMES, game.id)
+    ? REAL_GAMES[game.id]
+    : undefined;
+  const isReal = realGame !== undefined;
+  const engineRef = useRef<GameEngine | null>(null);
+  const [snapshot, setSnapshot] = useState<GameSnapshot>(
+    realGame?.initialSnapshot ?? FALLBACK_SNAPSHOT,
+  );
   const [fakeScore, setScore] = useState(0);
   const [fakeLives, setLives] = useState(INITIAL_LIVES);
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
   const [name, setName] = useState("INVITADO");
   const [saved, setSaved] = useState(false);
-  // Solo "asteroides" persiste: iniciales propias (3 caracteres) y estado de guardado.
+  // Los juegos reales persisten: iniciales propias (3 caracteres) y estado de guardado.
   const [initials, setInitials] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   // Evita un segundo envío en el mismo instante, antes de que `saving` se refleje.
   const savingRef = useRef(false);
-
   const score = isReal ? snapshot.score : fakeScore;
   const lives = isReal ? snapshot.lives : fakeLives;
   // En la simulación el nivel se deriva de la puntuación.
   const level = isReal
     ? snapshot.level
     : 1 + Math.floor(fakeScore / POINTS_PER_LEVEL);
-
-  const handleReady = useCallback((engine: AsteroidsEngine) => {
+  const handleReady = useCallback((engine: GameEngine) => {
     engineRef.current = engine;
   }, []);
   const handleGameOver = useCallback(() => {
     setPaused(false);
     setOver(true);
   }, []);
-
   // Temporizador falso: el azar vive solo aquí, dentro del efecto.
   useEffect(() => {
     if (isReal || over || paused) return;
@@ -71,7 +70,6 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
     );
     return () => clearInterval(t);
   }, [isReal, over, paused]);
-
   const togglePause = () => {
     const next = !paused;
     setPaused(next);
@@ -80,12 +78,10 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
       else engineRef.current?.resume();
     }
   };
-
   const endGame = () => {
     if (isReal) engineRef.current?.end();
     else setOver(true);
   };
-
   const restart = () => {
     if (isReal) engineRef.current?.restart();
     setScore(0);
@@ -97,7 +93,6 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
     setSaveError(null);
     savingRef.current = false;
   };
-
   const handleSave = async () => {
     if (savingRef.current) return;
     if (!isReal) {
@@ -105,7 +100,6 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
       setSaved(true);
       return;
     }
-
     const clean = initials.trim().toUpperCase();
     if (!INITIALS_PATTERN.test(clean)) {
       setSaveError(ERROR_MESSAGES.INITIALS);
@@ -115,7 +109,6 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
       setSaveError(ERROR_MESSAGES.NO_SCORE);
       return;
     }
-
     savingRef.current = true;
     setSaving(true);
     setSaveError(null);
@@ -136,7 +129,6 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
       setSaving(false);
     }
   };
-
   return (
     <div className="av-player fade-in">
       <div className="player-hud">
@@ -161,18 +153,10 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
           </div>
         </div>
         <div className="hud-actions">
-          <button
-            type="button"
-            className="btn yellow"
-            onClick={togglePause}
-          >
+          <button type="button" className="btn yellow" onClick={togglePause}>
             {paused ? "REANUDAR" : "PAUSA"}
           </button>
-          <button
-            type="button"
-            className="btn magenta"
-            onClick={endGame}
-          >
+          <button type="button" className="btn magenta" onClick={endGame}>
             FIN
           </button>
           <Link href={`/juegos/${game.id}`} className="btn ghost">
@@ -180,11 +164,10 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
           </Link>
         </div>
       </div>
-
       <div className="crt">
         <div className="crt-screen">
-          {isReal ? (
-            <AsteroidsCanvas
+          {realGame ? (
+            <realGame.Canvas
               onReady={handleReady}
               onChange={setSnapshot}
               onGameOver={handleGameOver}
@@ -228,10 +211,14 @@ export default function GamePlayer({ game }: { game: Pick<Game, "id" | "title"> 
           <span>CARGA · 1MB</span>
         </div>
       </div>
-
       {over && (
         <div className="modal-bd">
-          <div className="modal" role="dialog" aria-modal="true" aria-label="Fin del juego">
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Fin del juego"
+          >
             <h2>FIN DEL JUEGO</h2>
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{score.toLocaleString("es-ES")}</div>
