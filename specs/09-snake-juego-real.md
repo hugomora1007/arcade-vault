@@ -1,6 +1,6 @@
 # SPEC 09 — Snake como juego real (`snake`)
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 05, SPEC 06, SPEC 07 (registro de juegos reales)
 > **Date:** 2026-11-24
 > **Objective:** Crear Snake como motor TypeScript con canvas diseñado desde cero (sin código de referencia), usando las frutas de `references/source-assets/snake-assets`, montarlo en `/juegos/snake/jugar`, añadirlo al catálogo por migración y guardar sus puntuaciones en el leaderboard real.
