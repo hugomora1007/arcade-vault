@@ -113,7 +113,7 @@ Constantes del juego (diseño de este spec, no hay original):
 - Intervalo entre pasos: `tickMs = max(70, 140 - (level - 1) * 10)` → 140 ms en el nivel 1, 70 ms desde el nivel 8.
 - Nivel: `level = 1 + floor(frutas / 5)`, con `frutas = score / 10`.
 - Puntos: 10 por fruta. Máximo posible: 297 frutas (300 casillas − 3 iniciales) = **2 970 puntos**.
-- Frutas: `FRUIT_SPRITES` con las 22 entradas de `sprites.js` (`banana, orange, grape, garlic, eggplant, strawberry, cherry, carrot, mushroom, broccoli, watermelon, pepper, kiwi, lemon, peach, peanut, apple, tomato, berries, grapes2, pineapple, melon`), cada una `{ x, y, w, h }` con `y = 136`, `h = 160` y las `x`/`w` del atlas original. Fuente: `references/source-assets/snake-assets/sprites.js`.
+- Frutas: `FRUIT_SPRITES` con las 22 entradas de `sprites.js` (por orden de `x`: `apple, banana, pineapple, grapes, pumpkin, garlic, eggplant, strawberry, cherry, carrot, mushroom, broccoli, watermelon, pepper, kiwi, lemon, orange, peach, peanut, radish, tomato, fruitbowl`; los nombres de `sprites.js` no coincidían con el dibujo y se corrigieron al verificar el paso 4), cada una `{ x, y, w, h }` con `y = 136`, `h = 160` y las `x`/`w` del atlas original. Fuente: `references/source-assets/snake-assets/sprites.js`.
 - Dibujo de fruta: alto `36` px (90 % de la casilla), ancho proporcional a `w / h` y centrada en la casilla, con la imagen original reducida (suavizado activado).
 - Colores del tablero: casillas alternas `#aad751` / `#a2d149`; serpiente `#4674e9`; ojos blancos con pupila negra en la cabeza, orientados hacia la dirección de avance.
 - `dt` limitado a 50 ms (como los demás motores).

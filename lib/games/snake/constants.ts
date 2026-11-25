@@ -24,29 +24,31 @@ export const FRUIT_DRAW_H = 36;
 export const BOARD_COLORS = ["#aad751", "#a2d149"] as const;
 export const SNAKE_COLOR = "#4674e9";
 const fruit = (x: number, w: number): SpriteFrame => ({ x, y: 136, w, h: 160 });
-// Atlas trasladado de references/source-assets/snake-assets/sprites.js
+// Atlas trasladado de references/source-assets/snake-assets/sprites.js.
+// Las coordenadas son las originales; los nombres se corrigieron para que
+// coincidan con el dibujo real de cada recorte.
 export const FRUIT_SPRITES: Record<string, SpriteFrame> = {
-  banana: fruit(34, 110),
-  orange: fruit(186, 150),
-  grape: fruit(378, 110),
-  garlic: fruit(540, 130),
-  eggplant: fruit(712, 130),
-  strawberry: fruit(894, 110),
-  cherry: fruit(1066, 110),
-  carrot: fruit(1228, 130),
-  mushroom: fruit(1400, 130),
-  broccoli: fruit(1582, 110),
-  watermelon: fruit(1734, 150),
-  pepper: fruit(1906, 150),
-  kiwi: fruit(2068, 170),
-  lemon: fruit(2250, 140),
-  peach: fruit(2432, 130),
-  peanut: fruit(2604, 130),
-  apple: fruit(2786, 110),
-  tomato: fruit(2948, 130),
-  berries: fruit(3110, 150),
-  grapes2: fruit(3302, 110),
-  pineapple: fruit(3454, 150),
-  melon: fruit(3637, 130),
+  apple: fruit(34, 110),
+  banana: fruit(186, 150),
+  pineapple: fruit(378, 110),
+  grapes: fruit(540, 130),
+  pumpkin: fruit(712, 130),
+  garlic: fruit(894, 110),
+  eggplant: fruit(1066, 110),
+  strawberry: fruit(1228, 130),
+  cherry: fruit(1400, 130),
+  carrot: fruit(1582, 110),
+  mushroom: fruit(1734, 150),
+  broccoli: fruit(1906, 150),
+  watermelon: fruit(2068, 170),
+  pepper: fruit(2250, 140),
+  kiwi: fruit(2432, 130),
+  lemon: fruit(2604, 130),
+  orange: fruit(2786, 110),
+  peach: fruit(2948, 130),
+  peanut: fruit(3110, 150),
+  radish: fruit(3302, 110),
+  tomato: fruit(3454, 150),
+  fruitbowl: fruit(3637, 130),
 };
 export const FRUIT_NAMES: readonly string[] = Object.keys(FRUIT_SPRITES);
