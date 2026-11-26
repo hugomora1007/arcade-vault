@@ -26,6 +26,7 @@ No test runner is configured. Verify changes in the running app (Playwright MCP 
 Every feature starts as a spec in `specs/NN-slug.md` (Spanish; header with `Status`, `Depends on`, `Date`, `Objective`). Specs 01–09 are all `Implementado`.
 
 - `/spec <feature>` — designs a spec section by section (asks questions first). Writes only the `.md`.
+- `game-planner` — project subagent (`.claude/agents/game-planner.md`) that decides which game fits the platform next. Remembers past suggestions in `.claude/agent-memory/game-planner/` (`memory: project`, versioned) and keeps the ToDo `references/game-suggestions-todo.md`. Never writes specs or code; its pick feeds `/game-spec`.
 - `/game-spec <folder in references/started-games | game idea>` — project skill (`.claude/skills/game-spec/`) that writes the spec to bring a game into the platform (canvas engine, `games` row via migration, real leaderboard), following specs 05–09.
 - `/spec-impl <NN-spec-name>` — implements an approved spec: creates and switches to branch `spec-NN-slug` (`specs/.spec-config.yml` → `AutoCreateBranch: true`), works step by step, then the spec status is set to `Implementado`. Each spec is merged via PR.
 
@@ -34,6 +35,17 @@ Every feature starts as a spec in `specs/NN-slug.md` (Spanish; header with `Stat
 ## Skills
 
 Usa siempre /frontend-design para diseñar las interfaces de usuario.
+
+## Agents
+
+Project subagents live in `.claude/agents/` (loaded at session start; restart after adding one).
+
+- **`game-planner`** (`.claude/agents/game-planner.md`, model `opus`) — plans and decides which game fits Arcade Vault next. Use it when the user asks for game ideas or "the next game".
+  - Reads the catalog (`references/implemented-games.md`), `lib/games.ts`, `lib/games/registry.ts`, `specs/`, `references/started-games/`, `references/source-assets/` and the `cover-*` classes before proposing.
+  - Scores 1–3 candidates (leaderboard fit, HUD mapping to `GameSnapshot`, 4:3 canvas, keyboard, neon look, replayability, feasibility, category balance, reuse) and recommends one. Original/genre games only, never recreations of a specific title.
+  - Memory: `memory: project` → `.claude/agent-memory/game-planner/` (`MEMORY.md` index, `suggestions.md`, `preferences.md`), versioned in git so past suggestions are never repeated.
+  - Keeps the ToDo `references/game-suggestions-todo.md` (sections Pendientes / En spec / implementados / Descartados; entries are moved, never deleted).
+  - Writes only those two locations: no specs, code, migrations or DB changes. Next step is always `/game-spec <idea>`.
 
 ## Hooks
 
