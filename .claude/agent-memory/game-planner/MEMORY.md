@@ -4,8 +4,8 @@
 
 ## Sugerencias
 
-- [suggestions.md](suggestions.md) — historial de sugerencias y su estado (aún vacío).
+- [suggestions.md](suggestions.md) — historial por ronda; 2026-11-25: R1 (ESTELA rec., ENJAMBRE, ORBITAL) + R2 (20, 5 por categoría). 23 pendientes.
 
 ## Preferencias del usuario
 
-- [preferences.md](preferences.md) — gustos, rechazos y criterios del usuario (aún vacío).
+- [preferences.md](preferences.md) — sin preferencias explícitas aún; acepta juegos hechos desde cero (Snake).
