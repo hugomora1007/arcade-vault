@@ -45,6 +45,7 @@ export const REAL_GAMES: Record<
   tetris: {
     Canvas: TetrisCanvas,
     initialSnapshot: { score: 0, lives: 1, level: 1, phase: "playing" },
+    hasSkins: true,
   },
   arkanoid: {
     Canvas: ArkanoidCanvas,

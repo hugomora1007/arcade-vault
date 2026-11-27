@@ -1,3 +1,4 @@
+import type { SkinId } from "@/lib/games/skins";
 export type TetrisPhase = "playing" | "gameover";
 export interface TetrisSnapshot {
   score: number;
@@ -23,6 +24,8 @@ export interface TetrisEngine {
   end(): void;
   /** Cancela el requestAnimationFrame y elimina los listeners. */
   destroy(): void;
+  /** Cambia la paleta en caliente, sin reiniciar la partida. */
+  setSkin(skin: SkinId): void;
 }
 /** Matriz de una pieza: 0 = vacío, 1–7 = índice de color. */
 export type Shape = number[][];

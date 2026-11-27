@@ -5,7 +5,7 @@
 ## Juegos
 
 - `asteroides` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [asteroides-skins.md](asteroides-skins.md)
-- `tetris` · skins: ninguno · sin auditar · estado: ❌
+- `tetris` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [tetris-skins.md](tetris-skins.md)
 - `arkanoid` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [arkanoid-skins.md](arkanoid-skins.md)
 - `snake` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [snake-skins.md](snake-skins.md)
 

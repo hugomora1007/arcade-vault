@@ -11,6 +11,8 @@ Paletas de referencia para mantener coherencia entre juegos. Primer juego: `aste
 
 **retro** (fósforo ámbar, sin degradados): fondo `#0c0700`, brillante `#ffd98a` (jugador), muy brillante `#ffe6b0` (proyectiles, áreas pequeñas), medio `#ffc44d` (power-ups/texto), base `#e89a00` (rocas/enemigos), tenue `#a86a00` (decoración). `glow` 2, scanlines `rgba(0,0,0,0.28)` cada 4 px de 1 px. Jugador/enemigo 1.72:1 por brillo.
 
+**Rampa retro de 7 tonos** (tetris): `#ffe9b8 #ffc651 #efa819 #d98f00 #be7b00 #a56800 #8e5600`, ≥1.31:1 entre vecinos y ≥3.14:1 sobre `#0c0700`.
+
 **Selector**: el estado activo de RETRO en CSS usa `#ffb000` (no hay token ámbar en `:root`).
 
 **Why:** el prompt pide mismo ámbar en todos los `retro` y mismos tokens en todos los `neon`.
