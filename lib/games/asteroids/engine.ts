@@ -14,12 +14,14 @@ import {
   dist,
   rand,
 } from "./entities";
+import { SKINS, type AsteroidsPalette } from "./skins";
 import type {
   AsteroidsCallbacks,
   AsteroidsEngine,
   AsteroidsPhase,
   AsteroidsSnapshot,
 } from "./types";
+import { DEFAULT_SKIN, type SkinId } from "@/lib/games/skins";
 /** Teclas cuyo comportamiento por defecto (scroll, activar botón) se bloquea. */
 const BLOCKED_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "Space"]);
 function isFormField(target: EventTarget | null): boolean {
@@ -30,6 +32,7 @@ function isFormField(target: EventTarget | null): boolean {
 export function createAsteroidsEngine(
   canvas: HTMLCanvasElement,
   callbacks: AsteroidsCallbacks,
+  skin: SkinId = DEFAULT_SKIN,
 ): AsteroidsEngine {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D no disponible");
@@ -51,6 +54,7 @@ export function createAsteroidsEngine(
   let paused = false;
   let destroyed = false;
   let lastSnapshot: AsteroidsSnapshot | null = null;
+  let palette: AsteroidsPalette = SKINS[skin];
   // ── Input ──────────────────────────────────────────────────────────────────
   const keys: Record<string, boolean> = {};
   const justPressed: Record<string, boolean> = {};
@@ -225,13 +229,21 @@ export function createAsteroidsEngine(
   // ── Dibujo (sin HUD: lo muestra la plataforma) ─────────────────────────────
   function draw(): void {
     if (!ctx) return;
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = palette.background;
     ctx.fillRect(0, 0, W, H);
-    particles.forEach((p) => p.draw(ctx));
-    asteroids.forEach((a) => a.draw(ctx));
-    powerUps.forEach((p) => p.draw(ctx));
-    bullets.forEach((b) => b.draw(ctx));
-    ship.draw(ctx);
+    particles.forEach((p) => p.draw(ctx, palette));
+    asteroids.forEach((a) => a.draw(ctx, palette));
+    powerUps.forEach((p) => p.draw(ctx, palette));
+    bullets.forEach((b) => b.draw(ctx, palette));
+    ship.draw(ctx, palette);
+    if (palette.scanlines) drawScanlines(ctx);
+  }
+  /** Scanlines tenues de monitor CRT (skin retro). */
+  function drawScanlines(c: CanvasRenderingContext2D): void {
+    c.save();
+    c.fillStyle = palette.scanlineColor;
+    for (let y = 0; y < H; y += 4) c.fillRect(0, y, W, 1);
+    c.restore();
   }
   // ── Bucle principal ────────────────────────────────────────────────────────
   function loop(ts: number): void {
@@ -293,6 +305,11 @@ export function createAsteroidsEngine(
       clearInput();
       emit();
       callbacks.onGameOver(score);
+    },
+    setSkin(next) {
+      // Solo cambia la paleta: el estado de la partida no se toca.
+      palette = SKINS[next];
+      if (!destroyed) draw();
     },
     destroy() {
       destroyed = true;

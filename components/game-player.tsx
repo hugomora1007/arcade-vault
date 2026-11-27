@@ -8,6 +8,14 @@ import {
   type GameEngine,
   type GameSnapshot,
 } from "@/lib/games/registry";
+import {
+  DEFAULT_SKIN,
+  SKIN_IDS,
+  SKIN_LABELS,
+  loadSkin,
+  saveSkin,
+  type SkinId,
+} from "@/lib/games/skins";
 const INITIAL_LIVES = 3;
 const POINTS_PER_LEVEL = 2500;
 const INITIALS_PATTERN = /^[A-Z0-9]{3}$/;
@@ -32,6 +40,9 @@ export default function GamePlayer({
     ? REAL_GAMES[game.id]
     : undefined;
   const isReal = realGame !== undefined;
+  const hasSkins = realGame?.hasSkins === true;
+  // El render de servidor usa el skin por defecto; el guardado se lee en cliente.
+  const [skin, setSkin] = useState<SkinId>(DEFAULT_SKIN);
   const engineRef = useRef<GameEngine | null>(null);
   const [snapshot, setSnapshot] = useState<GameSnapshot>(
     realGame?.initialSnapshot ?? FALLBACK_SNAPSHOT,
@@ -61,6 +72,16 @@ export default function GamePlayer({
     setPaused(false);
     setOver(true);
   }, []);
+  useEffect(() => {
+    if (!hasSkins) return;
+    const stored = loadSkin(game.id);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage solo existe en cliente
+    if (stored !== DEFAULT_SKIN) setSkin(stored);
+  }, [hasSkins, game.id]);
+  const changeSkin = (next: SkinId) => {
+    setSkin(next);
+    saveSkin(game.id, next);
+  };
   // Temporizador falso: el azar vive solo aquí, dentro del efecto.
   useEffect(() => {
     if (isReal || over || paused) return;
@@ -152,6 +173,24 @@ export default function GamePlayer({
             <div className="v">{String(level).padStart(2, "0")}</div>
           </div>
         </div>
+        {hasSkins && (
+          <div className="skin-picker" role="group" aria-label="Skin del juego">
+            <span className="skin-picker-label">SKIN</span>
+            {SKIN_IDS.map((id) => (
+              <button
+                key={id}
+                type="button"
+                className={`skin-opt skin-${id}`}
+                aria-pressed={skin === id}
+                // No roba el foco: las teclas siguen llegando al juego.
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => changeSkin(id)}
+              >
+                {SKIN_LABELS[id]}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="hud-actions">
           <button type="button" className="btn yellow" onClick={togglePause}>
             {paused ? "REANUDAR" : "PAUSA"}
@@ -171,6 +210,7 @@ export default function GamePlayer({
               onReady={handleReady}
               onChange={setSnapshot}
               onGameOver={handleGameOver}
+              skin={skin}
             />
           ) : (
             <div className="game-arena">
