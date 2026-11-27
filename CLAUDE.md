@@ -52,6 +52,10 @@ Project subagents live in `.claude/agents/` (loaded at session start; restart af
   - Writes `specs/game-jam/<game-id>/`: `README.md` (pitch, criteria table, discarded concepts), `01-<id>-juego-real.md` (playable core + migration + leaderboard) and `02-<id>-<ampliación>.md`, both complete; optional `03-<id>-<pulido>.md`. All `Borrador`; own decisions marked «(decisión del agente, pendiente de revisar)».
   - Memory: `memory: project` → `.claude/agent-memory/game-jam/MEMORY.md` (theme → game-id index, discarded concepts).
   - Writes only those two locations: no code, migrations, CSS or DB changes; never overwrites an existing jam folder.
+- **`skin-designer`** (`.claude/agents/skin-designer.md`, model `opus`) — audits and implements skins for real games, **one game at a time: the one the user names** (if none is given it returns the list of `REAL_GAMES` and asks which). Use it when the user asks to review or set up a game's skins/themes.
+  - Every game in `REAL_GAMES` must have at least 3 skins: `clasico` (default), `neon`, `retro`; each must look good on the dark theme (dark board bg, WCAG contrast ≥ 3:1 entities / ≥ 4.5:1 canvas text, computed with a script). Simulated games are out of scope.
+  - Contract it creates/enforces: `lib/games/skins.ts` (`SkinId`, `DEFAULT_SKIN`, `SKIN_LABELS`, `loadSkin/saveSkin` with key `arcade-vault:skin:<gameId>`), `lib/games/<slug>/skins.ts` (`SKINS: Record<SkinId, Palette>`), `GameEngine.setSkin`, `GameCanvasProps.skin`, skin selector in `game-player.tsx`. Guide: `references/started-games/03-tetris/`.
+  - Verifies with lint, `tsc` and Playwright screenshots (`.playwright-mcp/skins/`). Keeps the matrix `references/game-with-themes.md`; memory in `.claude/agent-memory/skin-designer/`. Never touches migrations, DB, mechanics or scoring. «Solo auditar» → report only.
 
 ## Hooks
 
@@ -98,3 +102,4 @@ Project subagents live in `.claude/agents/` (loaded at session start; restart af
 - Each game lives in `lib/games/<slug>/` (`constants.ts`, `types.ts`, `entities.ts` for pure logic/drawing, `engine.ts` for loop/input/lifecycle) plus `components/games/<slug>-canvas.tsx`. Sprites go in `public/games/<slug>/` and are loaded on the client only (no `Image` during SSR).
 - Registered (examples): `asteroides`, `tetris`, `arkanoid` (spritesheet, 5 levels, win condition), `snake` (fruit atlas, built from scratch). For the complete list see `references/implemented-games.md`.
 - Adding a game: `/game-spec` → approve → `/spec-impl` (engine + canvas + registry entry + migration + spec status).
+- Skins: every real game needs `clasico`/`neon`/`retro` palettes that pass the dark-mode rules; run `skin-designer` after adding a game (status in `references/game-with-themes.md`).
