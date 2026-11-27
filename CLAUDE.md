@@ -26,7 +26,9 @@ No test runner is configured. Verify changes in the running app (Playwright MCP 
 Every feature starts as a spec in `specs/NN-slug.md` (Spanish; header with `Status`, `Depends on`, `Date`, `Objective`). Specs 01–09 are all `Implementado`.
 
 - `/spec <feature>` — designs a spec section by section (asks questions first). Writes only the `.md`.
+- `game-planner` — project subagent (`.claude/agents/game-planner.md`) that decides which game fits the platform next. Remembers past suggestions in `.claude/agent-memory/game-planner/` (`memory: project`, versioned) and keeps the ToDo `references/game-suggestions-todo.md`. Never writes specs or code; its pick feeds `/game-spec`.
 - `/game-spec <folder in references/started-games | game idea>` — project skill (`.claude/skills/game-spec/`) that writes the spec to bring a game into the platform (canvas engine, `games` row via migration, real leaderboard), following specs 05–09.
+- `game-jam` — project subagent (`.claude/agents/game-jam.md`): given a theme, designs one original game and writes a draft spec package in `specs/game-jam/<game-id>/` (`README.md` + `01-…-juego-real.md` + `02-…` ampliación [+ `03-…` pulido]), same format as specs 07–09. Drafts there are not implemented directly: once approved, promote each to `specs/NN-slug.md` and run `/spec-impl`.
 - `/spec-impl <NN-spec-name>` — implements an approved spec: creates and switches to branch `spec-NN-slug` (`specs/.spec-config.yml` → `AutoCreateBranch: true`), works step by step, then the spec status is set to `Implementado`. Each spec is merged via PR.
 
 `spec` and `spec-impl` come from `Klerith/fernando-skills` (`npx skills@latest add Klerith/fernando-skills`, pinned in `skills-lock.json`; copies in `.claude/skills/` and `.agents/skills/`).
@@ -34,6 +36,26 @@ Every feature starts as a spec in `specs/NN-slug.md` (Spanish; header with `Stat
 ## Skills
 
 Usa siempre /frontend-design para diseñar las interfaces de usuario.
+
+## Agents
+
+Project subagents live in `.claude/agents/` (loaded at session start; restart after adding one).
+
+- **`game-planner`** (`.claude/agents/game-planner.md`, model `opus`) — plans and decides which game fits Arcade Vault next. Use it when the user asks for game ideas or "the next game".
+  - Reads the catalog (`references/implemented-games.md`), `lib/games.ts`, `lib/games/registry.ts`, `specs/`, `references/started-games/`, `references/source-assets/` and the `cover-*` classes before proposing.
+  - Scores 1–3 candidates (leaderboard fit, HUD mapping to `GameSnapshot`, 4:3 canvas, keyboard, neon look, replayability, feasibility, category balance, reuse) and recommends one. Original/genre games only, never recreations of a specific title.
+  - Memory: `memory: project` → `.claude/agent-memory/game-planner/` (`MEMORY.md` index, `suggestions.md`, `preferences.md`), versioned in git so past suggestions are never repeated.
+  - Keeps the ToDo `references/game-suggestions-todo.md` (sections Pendientes / En spec / implementados / Descartados; entries are moved, never deleted).
+  - Writes only those two locations: no specs, code, migrations or DB changes. Next step is always `/game-spec <idea>`.
+- **`game-jam`** (`.claude/agents/game-jam.md`, model `opus`) — receives a theme and designs one original game for it, without asking questions. Use it when the user gives a game-jam theme.
+  - Reads specs 07–09 in full, the `game-spec` template, the catalog, `lib/games/registry.ts`, migrations (next `sort_order`), `cover-*` classes and assets before designing.
+  - Writes `specs/game-jam/<game-id>/`: `README.md` (pitch, criteria table, discarded concepts), `01-<id>-juego-real.md` (playable core + migration + leaderboard) and `02-<id>-<ampliación>.md`, both complete; optional `03-<id>-<pulido>.md`. All `Borrador`; own decisions marked «(decisión del agente, pendiente de revisar)».
+  - Memory: `memory: project` → `.claude/agent-memory/game-jam/MEMORY.md` (theme → game-id index, discarded concepts).
+  - Writes only those two locations: no code, migrations, CSS or DB changes; never overwrites an existing jam folder.
+- **`skin-designer`** (`.claude/agents/skin-designer.md`, model `opus`) — audits and implements skins for real games, **one game at a time: the one the user names** (if none is given it returns the list of `REAL_GAMES` and asks which). Use it when the user asks to review or set up a game's skins/themes.
+  - Every game in `REAL_GAMES` must have at least 3 skins: `clasico` (default), `neon`, `retro`; each must look good on the dark theme (dark board bg, WCAG contrast ≥ 3:1 entities / ≥ 4.5:1 canvas text, computed with a script). Simulated games are out of scope.
+  - Contract it creates/enforces: `lib/games/skins.ts` (`SkinId`, `DEFAULT_SKIN`, `SKIN_LABELS`, `loadSkin/saveSkin` with key `arcade-vault:skin:<gameId>`), `lib/games/<slug>/skins.ts` (`SKINS: Record<SkinId, Palette>`), `GameEngine.setSkin`, `GameCanvasProps.skin`, skin selector in `game-player.tsx`. Guide: `references/started-games/03-tetris/`.
+  - Verifies with lint, `tsc` and Playwright screenshots (`.playwright-mcp/skins/`). Keeps the matrix `references/game-with-themes.md`; memory in `.claude/agent-memory/skin-designer/`. Never touches migrations, DB, mechanics or scoring. «Solo auditar» → report only.
 
 ## Hooks
 
@@ -80,3 +102,4 @@ Usa siempre /frontend-design para diseñar las interfaces de usuario.
 - Each game lives in `lib/games/<slug>/` (`constants.ts`, `types.ts`, `entities.ts` for pure logic/drawing, `engine.ts` for loop/input/lifecycle) plus `components/games/<slug>-canvas.tsx`. Sprites go in `public/games/<slug>/` and are loaded on the client only (no `Image` during SSR).
 - Registered (examples): `asteroides`, `tetris`, `arkanoid` (spritesheet, 5 levels, win condition), `snake` (fruit atlas, built from scratch). For the complete list see `references/implemented-games.md`.
 - Adding a game: `/game-spec` → approve → `/spec-impl` (engine + canvas + registry entry + migration + spec status).
+- Skins: every real game needs `clasico`/`neon`/`retro` palettes that pass the dark-mode rules; run `skin-designer` after adding a game (status in `references/game-with-themes.md`).

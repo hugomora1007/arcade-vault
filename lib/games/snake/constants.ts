@@ -21,8 +21,6 @@ export const tickMs = (level: number): number =>
 export const FRUITS_URL = "/games/snake/fruits.png";
 /** Alto de la fruta al dibujarla (90 % de la casilla). */
 export const FRUIT_DRAW_H = 36;
-export const BOARD_COLORS = ["#aad751", "#a2d149"] as const;
-export const SNAKE_COLOR = "#4674e9";
 const fruit = (x: number, w: number): SpriteFrame => ({ x, y: 136, w, h: 160 });
 // Atlas trasladado de references/source-assets/snake-assets/sprites.js.
 // Las coordenadas son las originales; los nombres se corrigieron para que

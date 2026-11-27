@@ -8,7 +8,6 @@ import {
   MIN_DROP_INTERVAL,
   NEXT_Y,
   PANEL_X,
-  TEXT_COLOR,
   WALL_KICKS,
   COLS,
   ROWS,
@@ -22,11 +21,14 @@ import {
   drawGrid,
   drawNext,
   drawPiece,
+  drawScanlines,
   ghostY,
   merge,
   randomPiece,
   rotateCW,
 } from "./entities";
+import { SKINS, type TetrisPalette } from "./skins";
+import { DEFAULT_SKIN, type SkinId } from "@/lib/games/skins";
 import type {
   Board,
   Piece,
@@ -60,6 +62,7 @@ function dropIntervalFor(level: number): number {
 export function createTetrisEngine(
   canvas: HTMLCanvasElement,
   callbacks: TetrisCallbacks,
+  skin: SkinId = DEFAULT_SKIN,
 ): TetrisEngine {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D no disponible");
@@ -77,6 +80,7 @@ export function createTetrisEngine(
   let paused = false;
   let destroyed = false;
   let lastSnapshot: TetrisSnapshot | null = null;
+  let palette: TetrisPalette = SKINS[skin];
   // ── Emisión hacia React ────────────────────────────────────────────────────
   function emit(): void {
     const snap: TetrisSnapshot = {
@@ -207,24 +211,26 @@ export function createTetrisEngine(
   // ── Dibujo (sin HUD de plataforma: solo tablero y panel NEXT/LÍNEAS) ───────
   function drawPanel(): void {
     if (!ctx) return;
-    ctx.fillStyle = TEXT_COLOR;
+    ctx.fillStyle = palette.text;
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     ctx.font = "bold 18px monospace";
     ctx.fillText("NEXT", PANEL_X, NEXT_Y - 14);
     ctx.fillText("LÍNEAS", PANEL_X, LINES_Y);
     ctx.font = "bold 36px monospace";
+    ctx.fillStyle = palette.textAccent;
     ctx.fillText(String(lines), PANEL_X, LINES_Y + 44);
   }
   function draw(): void {
     if (!ctx) return;
-    drawBackground(ctx);
-    drawGrid(ctx);
-    drawBoard(ctx, board);
-    drawGhost(ctx, board, current);
-    drawPiece(ctx, current);
-    drawNext(ctx, next);
+    drawBackground(ctx, palette);
+    drawGrid(ctx, palette);
+    drawBoard(ctx, board, palette);
+    drawGhost(ctx, board, current, palette);
+    drawPiece(ctx, current, palette);
+    drawNext(ctx, next, palette);
     drawPanel();
+    drawScanlines(ctx, palette);
   }
   // ── Bucle principal ────────────────────────────────────────────────────────
   function loop(ts: number): void {
@@ -293,6 +299,11 @@ export function createTetrisEngine(
     end() {
       if (destroyed) return;
       finishGame();
+    },
+    setSkin(nextSkin) {
+      // Solo cambia la paleta: el estado de la partida no se toca.
+      palette = SKINS[nextSkin];
+      if (!destroyed) draw();
     },
     destroy() {
       destroyed = true;

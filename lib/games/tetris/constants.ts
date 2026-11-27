@@ -13,20 +13,7 @@ export const PANEL_X = 490;
 export const NEXT_Y = 60;
 export const NEXT_SIZE = 4 * BLOCK;
 export const LINES_Y = 260;
-export const BG_COLOR = "#1a1a25";
-export const GRID_COLOR = "rgba(255, 255, 255, 0.06)";
-export const TEXT_COLOR = "#e8e8f0";
-/** Índice 1–7: I, O, T, S, Z, J, L. El índice 0 (vacío) no tiene color. */
-export const COLORS: readonly (string | null)[] = [
-  null,
-  "#4dd0e1", // I
-  "#ffd54f", // O
-  "#ba68c8", // T
-  "#81c784", // S
-  "#e57373", // Z
-  "#90caf9", // J
-  "#ffb74d", // L
-];
+/** Los colores (fondo, rejilla, texto y piezas) viven en `skins.ts`. */
 export const PIECES: readonly (Shape | null)[] = [
   null,
   [
@@ -75,4 +62,3 @@ export const DROP_INTERVAL_STEP = 90;
 export const MIN_DROP_INTERVAL = 100;
 /** Límite del delta de tiempo por frame (segundos), como Asteroides. */
 export const MAX_DT = 0.05;
-export const GHOST_ALPHA = 0.2;

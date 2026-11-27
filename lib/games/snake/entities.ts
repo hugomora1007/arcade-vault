@@ -1,5 +1,4 @@
 import {
-  BOARD_COLORS,
   CELL,
   COLS,
   FRUIT_DRAW_H,
@@ -7,8 +6,8 @@ import {
   INITIAL_DIRECTION,
   INITIAL_SNAKE,
   ROWS,
-  SNAKE_COLOR,
 } from "./constants";
+import type { SnakePalette } from "./skins";
 import type { Cell, Direction } from "./types";
 export const DIR_VECTORS: Record<Direction, Cell> = {
   up: { col: 0, row: -1 },
@@ -71,10 +70,13 @@ export interface Fruit {
   /** Clave de `FRUIT_SPRITES`. */
   sprite: string;
 }
-export function drawBoard(ctx: CanvasRenderingContext2D): void {
+export function drawBoard(
+  ctx: CanvasRenderingContext2D,
+  palette: SnakePalette,
+): void {
   for (let row = 0; row < ROWS; row++) {
     for (let col = 0; col < COLS; col++) {
-      ctx.fillStyle = BOARD_COLORS[(col + row) % 2];
+      ctx.fillStyle = palette.board[(col + row) % 2];
       ctx.fillRect(col * CELL, row * CELL, CELL, CELL);
     }
   }
@@ -83,20 +85,44 @@ export function drawFruit(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
   fruit: Fruit,
+  palette: SnakePalette,
 ): void {
   const s = FRUIT_SPRITES[fruit.sprite];
   if (!s) return;
+  ctx.save();
+  // Disco con anillo: la fruta se localiza aunque su sprite sea oscuro.
+  const cx = fruit.cell.col * CELL + CELL / 2;
+  const cy = fruit.cell.row * CELL + CELL / 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, CELL / 2 - 2, 0, Math.PI * 2);
+  ctx.fillStyle = palette.fruitHalo;
+  ctx.fill();
+  ctx.shadowColor = palette.fruitRing;
+  ctx.shadowBlur = palette.glow;
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = palette.fruitRing;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
   const dh = FRUIT_DRAW_H;
   const dw = (s.w / s.h) * dh;
   const dx = fruit.cell.col * CELL + (CELL - dw) / 2;
   const dy = fruit.cell.row * CELL + (CELL - dh) / 2;
   ctx.imageSmoothingEnabled = true;
+  ctx.filter = palette.fruitFilter;
   ctx.drawImage(img, s.x, s.y, s.w, s.h, dx, dy, dw, dh);
+  ctx.restore();
 }
-export function drawSnake(ctx: CanvasRenderingContext2D, snake: Snake): void {
+export function drawSnake(
+  ctx: CanvasRenderingContext2D,
+  snake: Snake,
+  palette: SnakePalette,
+): void {
   const inset = 3;
   const size = CELL - inset * 2;
-  ctx.fillStyle = SNAKE_COLOR;
+  ctx.save();
+  ctx.shadowColor = palette.body;
+  ctx.shadowBlur = palette.glow;
+  ctx.fillStyle = palette.body;
   for (let i = 0; i < snake.segments.length; i++) {
     const seg = snake.segments[i];
     const x = seg.col * CELL + inset;
@@ -117,9 +143,26 @@ export function drawSnake(ctx: CanvasRenderingContext2D, snake: Snake): void {
       );
     }
   }
-  drawEyes(ctx, snake);
+  // Cabeza encima del cuerpo con su propio color (en clásico coincide).
+  ctx.shadowColor = palette.head;
+  ctx.fillStyle = palette.head;
+  ctx.beginPath();
+  ctx.roundRect(
+    snake.head.col * CELL + inset,
+    snake.head.row * CELL + inset,
+    size,
+    size,
+    10,
+  );
+  ctx.fill();
+  ctx.restore();
+  drawEyes(ctx, snake, palette);
 }
-function drawEyes(ctx: CanvasRenderingContext2D, snake: Snake): void {
+function drawEyes(
+  ctx: CanvasRenderingContext2D,
+  snake: Snake,
+  palette: SnakePalette,
+): void {
   const v = DIR_VECTORS[snake.direction];
   const cx = snake.head.col * CELL + CELL / 2;
   const cy = snake.head.row * CELL + CELL / 2;
@@ -129,11 +172,11 @@ function drawEyes(ctx: CanvasRenderingContext2D, snake: Snake): void {
   for (const side of [-1, 1]) {
     const ex = cx + v.col * 6 + px * side * 8;
     const ey = cy + v.row * 6 + py * side * 8;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = palette.eyeWhite;
     ctx.beginPath();
     ctx.arc(ex, ey, 6, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = palette.eyePupil;
     ctx.beginPath();
     ctx.arc(ex + v.col * 2, ey + v.row * 2, 3, 0, Math.PI * 2);
     ctx.fill();

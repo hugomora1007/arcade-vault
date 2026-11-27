@@ -1,12 +1,8 @@
 import {
-  BG_COLOR,
   BLOCK,
   BOARD_X,
   BOARD_Y,
-  COLORS,
   COLS,
-  GHOST_ALPHA,
-  GRID_COLOR,
   H,
   NEXT_SIZE,
   NEXT_Y,
@@ -16,6 +12,7 @@ import {
   ROWS,
   W,
 } from "./constants";
+import type { TetrisPalette } from "./skins";
 import type { Board, Piece, Shape } from "./types";
 export function createBoard(): Board {
   return Array.from({ length: ROWS }, () => new Array<number>(COLS).fill(0));
@@ -87,29 +84,69 @@ export function drawBlock(
   gy: number,
   colorIndex: number,
   size: number,
+  palette: TetrisPalette,
   ox = 0,
   oy = 0,
-  alpha = 1,
+  ghost = false,
 ): void {
   if (!colorIndex) return;
-  const color = COLORS[colorIndex];
+  const color = palette.pieces[colorIndex - 1];
   if (!color) return;
   const px = ox + gx * size;
   const py = oy + gy * size;
-  ctx.globalAlpha = alpha;
+  ctx.save();
+  if (ghost) {
+    // Pieza fantasma: sin glow, translúcida (relleno o contorno según skin).
+    ctx.globalAlpha = palette.ghostAlpha;
+    if (palette.ghostStyle === "outline") {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(px + 2, py + 2, size - 4, size - 4);
+    } else {
+      ctx.fillStyle = color;
+      ctx.fillRect(px + 1, py + 1, size - 2, size - 2);
+    }
+    ctx.restore();
+    return;
+  }
+  ctx.shadowColor = color;
+  ctx.shadowBlur = palette.glow;
   ctx.fillStyle = color;
   ctx.fillRect(px + 1, py + 1, size - 2, size - 2);
+  ctx.shadowBlur = 0;
   // realce
-  ctx.fillStyle = "rgba(255,255,255,0.12)";
+  ctx.fillStyle = palette.highlight;
   ctx.fillRect(px + 1, py + 1, size - 2, 4);
-  ctx.globalAlpha = 1;
+  if (palette.cellBorder) {
+    ctx.strokeStyle = palette.cellBorder;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px + 4, py + 4, size - 8, size - 8);
+  }
+  ctx.restore();
 }
-export function drawBackground(ctx: CanvasRenderingContext2D): void {
-  ctx.fillStyle = BG_COLOR;
+export function drawBackground(
+  ctx: CanvasRenderingContext2D,
+  palette: TetrisPalette,
+): void {
+  ctx.fillStyle = palette.bg;
   ctx.fillRect(0, 0, W, H);
 }
-export function drawGrid(ctx: CanvasRenderingContext2D): void {
-  ctx.strokeStyle = GRID_COLOR;
+/** Scanlines tenues de monitor CRT (skin retro). */
+export function drawScanlines(
+  ctx: CanvasRenderingContext2D,
+  palette: TetrisPalette,
+): void {
+  if (!palette.scanlines) return;
+  ctx.save();
+  ctx.fillStyle = palette.scanlineColor;
+  for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 1);
+  ctx.restore();
+}
+export function drawGrid(
+  ctx: CanvasRenderingContext2D,
+  palette: TetrisPalette,
+): void {
+  ctx.strokeStyle = palette.grid;
   ctx.lineWidth = 1;
   ctx.beginPath();
   for (let c = 0; c <= COLS; c++) {
@@ -124,10 +161,14 @@ export function drawGrid(ctx: CanvasRenderingContext2D): void {
   }
   ctx.stroke();
 }
-export function drawBoard(ctx: CanvasRenderingContext2D, board: Board): void {
+export function drawBoard(
+  ctx: CanvasRenderingContext2D,
+  board: Board,
+  palette: TetrisPalette,
+): void {
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      drawBlock(ctx, c, r, board[r][c], BLOCK, BOARD_X, BOARD_Y);
+      drawBlock(ctx, c, r, board[r][c], BLOCK, palette, BOARD_X, BOARD_Y);
     }
   }
 }
@@ -135,6 +176,7 @@ export function drawGhost(
   ctx: CanvasRenderingContext2D,
   board: Board,
   piece: Piece,
+  palette: TetrisPalette,
 ): void {
   const gy = ghostY(board, piece);
   for (let r = 0; r < piece.shape.length; r++) {
@@ -145,14 +187,19 @@ export function drawGhost(
         gy + r,
         piece.shape[r][c],
         BLOCK,
+        palette,
         BOARD_X,
         BOARD_Y,
-        GHOST_ALPHA,
+        true,
       );
     }
   }
 }
-export function drawPiece(ctx: CanvasRenderingContext2D, piece: Piece): void {
+export function drawPiece(
+  ctx: CanvasRenderingContext2D,
+  piece: Piece,
+  palette: TetrisPalette,
+): void {
   for (let r = 0; r < piece.shape.length; r++) {
     for (let c = 0; c < piece.shape[r].length; c++) {
       drawBlock(
@@ -161,6 +208,7 @@ export function drawPiece(ctx: CanvasRenderingContext2D, piece: Piece): void {
         piece.y + r,
         piece.shape[r][c],
         BLOCK,
+        palette,
         BOARD_X,
         BOARD_Y,
       );
@@ -168,15 +216,28 @@ export function drawPiece(ctx: CanvasRenderingContext2D, piece: Piece): void {
   }
 }
 /** Vista previa NEXT: la pieza centrada en una cuadrícula de 4×4 celdas. */
-export function drawNext(ctx: CanvasRenderingContext2D, next: Piece): void {
-  ctx.fillStyle = "rgba(255,255,255,0.04)";
+export function drawNext(
+  ctx: CanvasRenderingContext2D,
+  next: Piece,
+  palette: TetrisPalette,
+): void {
+  ctx.fillStyle = palette.nextBg;
   ctx.fillRect(PANEL_X, NEXT_Y, NEXT_SIZE, NEXT_SIZE);
   const { shape } = next;
   const offX = Math.floor((4 - shape[0].length) / 2);
   const offY = Math.floor((4 - shape.length) / 2);
   for (let r = 0; r < shape.length; r++) {
     for (let c = 0; c < shape[r].length; c++) {
-      drawBlock(ctx, offX + c, offY + r, shape[r][c], BLOCK, PANEL_X, NEXT_Y);
+      drawBlock(
+        ctx,
+        offX + c,
+        offY + r,
+        shape[r][c],
+        BLOCK,
+        palette,
+        PANEL_X,
+        NEXT_Y,
+      );
     }
   }
 }

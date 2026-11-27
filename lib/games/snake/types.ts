@@ -1,3 +1,4 @@
+import type { SkinId } from "@/lib/games/skins";
 export type SnakePhase = "playing" | "won" | "gameover";
 export interface SnakeSnapshot {
   score: number; // 10 por fruta
@@ -20,6 +21,8 @@ export interface SnakeEngine {
   restart(): void;
   /** Botón FIN: dispara onGameOver con el score actual. */
   end(): void;
+  /** Cambia el skin en caliente sin reiniciar la partida. */
+  setSkin(skin: SkinId): void;
   /** Cancela el requestAnimationFrame y elimina los listeners. */
   destroy(): void;
 }

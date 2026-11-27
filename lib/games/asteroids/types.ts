@@ -1,3 +1,4 @@
+import type { SkinId } from "@/lib/games/skins";
 export type AsteroidsPhase = "playing" | "dead" | "gameover";
 
 export interface AsteroidsSnapshot {
@@ -22,6 +23,8 @@ export interface AsteroidsEngine {
   restart(): void;
   /** Termina la partida en curso (botón FIN): dispara onGameOver con el score actual. */
   end(): void;
+  /** Cambia la paleta en caliente, sin reiniciar la partida. */
+  setSkin(skin: SkinId): void;
   /** Cancela el requestAnimationFrame y elimina los listeners. */
   destroy(): void;
 }

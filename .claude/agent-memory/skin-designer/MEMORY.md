@@ -1,0 +1,18 @@
+# Memoria de skin-designer
+
+Índice de skins por juego real (una línea por juego). Mantenido por el subagente `skin-designer`.
+
+## Juegos
+
+- `asteroides` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [asteroides-skins.md](asteroides-skins.md)
+- `tetris` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [tetris-skins.md](tetris-skins.md)
+- `arkanoid` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [arkanoid-skins.md](arkanoid-skins.md)
+- `snake` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [snake-skins.md](snake-skins.md)
+
+## Paletas comunes
+
+- [paletas-comunes.md](paletas-comunes.md): hex de neon (tokens de la web) y retro (fósforo ámbar) para reutilizarlos en todos los juegos
+
+## Decisiones y preferencias del usuario
+
+- 2026-11-26 · Skins obligatorios: `clasico` (default), `neon`, `retro`. Solo juegos reales. «Modo oscuro» = verse bien sobre el tema oscuro actual (no añadir modo claro).
