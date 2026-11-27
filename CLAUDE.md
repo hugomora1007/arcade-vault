@@ -28,6 +28,7 @@ Every feature starts as a spec in `specs/NN-slug.md` (Spanish; header with `Stat
 - `/spec <feature>` — designs a spec section by section (asks questions first). Writes only the `.md`.
 - `game-planner` — project subagent (`.claude/agents/game-planner.md`) that decides which game fits the platform next. Remembers past suggestions in `.claude/agent-memory/game-planner/` (`memory: project`, versioned) and keeps the ToDo `references/game-suggestions-todo.md`. Never writes specs or code; its pick feeds `/game-spec`.
 - `/game-spec <folder in references/started-games | game idea>` — project skill (`.claude/skills/game-spec/`) that writes the spec to bring a game into the platform (canvas engine, `games` row via migration, real leaderboard), following specs 05–09.
+- `game-jam` — project subagent (`.claude/agents/game-jam.md`): given a theme, designs one original game and writes a draft spec package in `specs/game-jam/<game-id>/` (`README.md` + `01-…-juego-real.md` + `02-…` ampliación [+ `03-…` pulido]), same format as specs 07–09. Drafts there are not implemented directly: once approved, promote each to `specs/NN-slug.md` and run `/spec-impl`.
 - `/spec-impl <NN-spec-name>` — implements an approved spec: creates and switches to branch `spec-NN-slug` (`specs/.spec-config.yml` → `AutoCreateBranch: true`), works step by step, then the spec status is set to `Implementado`. Each spec is merged via PR.
 
 `spec` and `spec-impl` come from `Klerith/fernando-skills` (`npx skills@latest add Klerith/fernando-skills`, pinned in `skills-lock.json`; copies in `.claude/skills/` and `.agents/skills/`).
@@ -46,6 +47,11 @@ Project subagents live in `.claude/agents/` (loaded at session start; restart af
   - Memory: `memory: project` → `.claude/agent-memory/game-planner/` (`MEMORY.md` index, `suggestions.md`, `preferences.md`), versioned in git so past suggestions are never repeated.
   - Keeps the ToDo `references/game-suggestions-todo.md` (sections Pendientes / En spec / implementados / Descartados; entries are moved, never deleted).
   - Writes only those two locations: no specs, code, migrations or DB changes. Next step is always `/game-spec <idea>`.
+- **`game-jam`** (`.claude/agents/game-jam.md`, model `opus`) — receives a theme and designs one original game for it, without asking questions. Use it when the user gives a game-jam theme.
+  - Reads specs 07–09 in full, the `game-spec` template, the catalog, `lib/games/registry.ts`, migrations (next `sort_order`), `cover-*` classes and assets before designing.
+  - Writes `specs/game-jam/<game-id>/`: `README.md` (pitch, criteria table, discarded concepts), `01-<id>-juego-real.md` (playable core + migration + leaderboard) and `02-<id>-<ampliación>.md`, both complete; optional `03-<id>-<pulido>.md`. All `Borrador`; own decisions marked «(decisión del agente, pendiente de revisar)».
+  - Memory: `memory: project` → `.claude/agent-memory/game-jam/MEMORY.md` (theme → game-id index, discarded concepts).
+  - Writes only those two locations: no code, migrations, CSS or DB changes; never overwrites an existing jam folder.
 
 ## Hooks
 
