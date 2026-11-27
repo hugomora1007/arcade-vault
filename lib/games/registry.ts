@@ -49,9 +49,11 @@ export const REAL_GAMES: Record<
   arkanoid: {
     Canvas: ArkanoidCanvas,
     initialSnapshot: { score: 0, lives: 3, level: 1, phase: "playing" },
+    hasSkins: true,
   },
   snake: {
     Canvas: SnakeCanvas,
     initialSnapshot: { score: 0, lives: 1, level: 1, phase: "playing" },
+    hasSkins: true,
   },
 };

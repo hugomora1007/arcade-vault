@@ -20,6 +20,8 @@ import {
   sameCell,
 } from "./entities";
 import type { Fruit } from "./entities";
+import { SKINS, type SnakePalette } from "./skins";
+import { DEFAULT_SKIN, type SkinId } from "@/lib/games/skins";
 import type {
   Cell,
   Direction,
@@ -48,6 +50,7 @@ function isFormField(target: EventTarget | null): boolean {
 export function createSnakeEngine(
   canvas: HTMLCanvasElement,
   callbacks: SnakeCallbacks,
+  skin: SkinId = DEFAULT_SKIN,
 ): SnakeEngine {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D no disponible");
@@ -70,6 +73,7 @@ export function createSnakeEngine(
   let rafId: number | null = null;
   let lastTime: number | null = null;
   let lastSnapshot: SnakeSnapshot | null = null;
+  let palette: SnakePalette = SKINS[skin];
   // ── Emisión hacia React ────────────────────────────────────────────────────
   function emit(): void {
     const snap: SnakeSnapshot = { score, lives: 1, level, phase };
@@ -164,9 +168,17 @@ export function createSnakeEngine(
   function draw(): void {
     if (!ctx) return;
     ctx.clearRect(0, 0, W, H);
-    drawBoard(ctx);
-    if (img && loaded && fruit) drawFruit(ctx, img, fruit);
-    drawSnake(ctx, snake);
+    drawBoard(ctx, palette);
+    if (img && loaded && fruit) drawFruit(ctx, img, fruit, palette);
+    drawSnake(ctx, snake, palette);
+    if (palette.scanlines) drawScanlines(ctx);
+  }
+  /** Scanlines tenues de monitor CRT (skin retro). */
+  function drawScanlines(c: CanvasRenderingContext2D): void {
+    c.save();
+    c.fillStyle = palette.scanlineColor;
+    for (let y = 0; y < H; y += 4) c.fillRect(0, y, W, 1);
+    c.restore();
   }
   // ── Input ──────────────────────────────────────────────────────────────────
   function onKeyDown(e: KeyboardEvent): void {
@@ -251,6 +263,11 @@ export function createSnakeEngine(
     end() {
       if (destroyed) return;
       finishGame("gameover");
+    },
+    setSkin(next) {
+      // Solo cambia la paleta: el estado de la partida no se toca.
+      palette = SKINS[next];
+      if (!destroyed) draw();
     },
     destroy() {
       destroyed = true;

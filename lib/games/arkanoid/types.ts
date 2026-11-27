@@ -1,3 +1,4 @@
+import type { SkinId } from "@/lib/games/skins";
 export type ArkanoidPhase = "playing" | "won" | "gameover";
 export interface ArkanoidSnapshot {
   score: number;
@@ -22,6 +23,8 @@ export interface ArkanoidEngine {
   restart(): void;
   /** Botón FIN: dispara onGameOver con el score actual. */
   end(): void;
+  /** Cambia el skin en caliente sin tocar el estado de la partida. */
+  setSkin(skin: SkinId): void;
   /** Cancela el requestAnimationFrame y elimina los listeners. */
   destroy(): void;
 }

@@ -6,8 +6,8 @@
 
 - `asteroides` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [asteroides-skins.md](asteroides-skins.md)
 - `tetris` · skins: ninguno · sin auditar · estado: ❌
-- `arkanoid` · skins: ninguno · sin auditar · estado: ❌
-- `snake` · skins: ninguno · sin auditar · estado: ❌ (tablero `#aad751`/`#a2d149` demasiado claro para modo oscuro)
+- `arkanoid` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [arkanoid-skins.md](arkanoid-skins.md)
+- `snake` · skins: clasico, neon, retro · auditado 2026-11-26 · estado: ✅ → [snake-skins.md](snake-skins.md)
 
 ## Paletas comunes
 

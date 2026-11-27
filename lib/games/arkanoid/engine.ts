@@ -9,6 +9,7 @@ import {
   W,
 } from "./constants";
 import {
+  buildSkinSheet,
   collideAABB,
   createBall,
   createBlocks,
@@ -21,6 +22,8 @@ import {
 } from "./entities";
 import type { Ball, Block, Explosion, Paddle } from "./entities";
 import { LEVELS } from "./levels";
+import { SKINS, type ArkanoidPalette } from "./skins";
+import { DEFAULT_SKIN, type SkinId } from "@/lib/games/skins";
 import type {
   ArkanoidCallbacks,
   ArkanoidEngine,
@@ -37,6 +40,7 @@ function isFormField(target: EventTarget | null): boolean {
 export function createArkanoidEngine(
   canvas: HTMLCanvasElement,
   callbacks: ArkanoidCallbacks,
+  skin: SkinId = DEFAULT_SKIN,
 ): ArkanoidEngine {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D no disponible");
@@ -51,6 +55,10 @@ export function createArkanoidEngine(
   let phase: ArkanoidPhase = "playing";
   const keys = { left: false, right: false };
   let img: HTMLImageElement | null = null;
+  let palette: ArkanoidPalette = SKINS[skin];
+  // Spritesheet teñido por skin (se genera una vez por skin y se reutiliza).
+  const sheets = new Map<ArkanoidPalette, CanvasImageSource>();
+  let sheet: CanvasImageSource | null = null;
   let loaded = false;
   let started = false;
   let paused = false;
@@ -174,15 +182,38 @@ export function createArkanoidEngine(
   // ── Dibujo (sin HUD ni overlays: los muestra la plataforma) ────────────────
   function draw(): void {
     if (!ctx) return;
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = palette.background;
     ctx.fillRect(0, 0, W, H);
-    if (!img || !loaded) return;
+    if (!sheet || !loaded) return;
     for (const block of blocks) {
-      if (block.alive) drawBlock(ctx, img, block);
+      if (block.alive) drawBlock(ctx, sheet, block);
     }
-    for (const exp of explosions) drawExplosion(ctx, img, exp);
-    drawPaddle(ctx, img, paddle);
-    drawBall(ctx, img, ball);
+    for (const exp of explosions) drawExplosion(ctx, sheet, exp);
+    ctx.save();
+    ctx.shadowBlur = palette.glow;
+    ctx.shadowColor = palette.paddleGlow;
+    drawPaddle(ctx, sheet, paddle);
+    ctx.shadowColor = palette.ballGlow;
+    drawBall(ctx, sheet, ball);
+    ctx.restore();
+    if (palette.scanlines) drawScanlines(ctx);
+  }
+  /** Scanlines tenues de monitor CRT (skin retro). */
+  function drawScanlines(c: CanvasRenderingContext2D): void {
+    c.save();
+    c.fillStyle = palette.scanlineColor;
+    for (let y = 0; y < H; y += 4) c.fillRect(0, y, W, 1);
+    c.restore();
+  }
+  /** Prepara (o recupera de la caché) el spritesheet del skin activo. */
+  function applySheet(): void {
+    if (!img || !loaded) return;
+    let next = sheets.get(palette);
+    if (!next) {
+      next = buildSkinSheet(img, palette);
+      sheets.set(palette, next);
+    }
+    sheet = next;
   }
   // ── Input ──────────────────────────────────────────────────────────────────
   function onKeyDown(e: KeyboardEvent): void {
@@ -244,6 +275,7 @@ export function createArkanoidEngine(
       image.onload = () => {
         if (destroyed) return;
         loaded = true;
+        applySheet();
         draw();
         startLoop();
       };
@@ -276,8 +308,16 @@ export function createArkanoidEngine(
       if (destroyed) return;
       finishGame("gameover");
     },
+    setSkin(next) {
+      // Solo cambia la paleta: el estado de la partida no se toca.
+      palette = SKINS[next];
+      applySheet();
+      if (!destroyed) draw();
+    },
     destroy() {
       destroyed = true;
+      sheets.clear();
+      sheet = null;
       stopLoop();
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
